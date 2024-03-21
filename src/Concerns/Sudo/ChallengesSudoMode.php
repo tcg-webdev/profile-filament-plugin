@@ -39,6 +39,10 @@ trait ChallengesSudoMode
             $options[] = SudoChallengeMode::App->value;
         }
 
+        if (Mfa::canUseTextOTPForChallenge($user)) {
+            $options[] = SudoChallengeMode::Text->value;
+        }
+
         // Passkeys or security key
         if (Mfa::canUseWebauthnForChallenge($user)) {
             $options[] = SudoChallengeMode::Webauthn->value;

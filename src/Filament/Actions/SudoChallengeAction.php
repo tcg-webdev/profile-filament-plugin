@@ -148,7 +148,7 @@ class SudoChallengeAction extends Action
             ->schema([
                 $livewire->sudoChallengeModeEnum === SudoChallengeMode::Password
                     ? $this->getPasswordInput()
-                    : $this->getTotpInput(),
+                    : ($livewire->sudoChallengeModeEnum === SudoChallengeMode::Text ? $this->getTextInput() :$this->getTotpInput()),
             ]);
     }
 
@@ -183,6 +183,20 @@ class SudoChallengeAction extends Action
             ]);
     }
 
+    protected function getTextInput(): FormComponent
+    {
+        return TextInput::make('code')
+                        ->id('sudo_challenge.text')
+                        ->hiddenLabel()
+                        ->placeholder(__('profile-filament::messages.sudo_challenge.totp.placeholder'))
+                        ->helperText(__('profile-filament::messages.sudo_challenge.text.help_text'))
+                        ->statePath('sudoChallengeData.text')
+                        ->required()
+                        ->extraInputAttributes([
+                            'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction(' . Js::from(['method' => 'confirm']) . ')',
+                        ]);
+    }
+
     protected function user(): User
     {
         return $this->user ?? ($this->user = filament()->auth()->user());
@@ -199,7 +213,14 @@ class SudoChallengeAction extends Action
                 }
 
                 break;
+            case SudoChallengeMode::Text->value:
+                if (! Mfa::usingChallengedUser($this->user())->isValidOtpCode($data['text'] ?? '')) {
+                    $this->error = __('profile-filament::messages.sudo_challenge.text.invalid');
 
+                    $action->halt();
+                }
+
+                break;
             case SudoChallengeMode::Webauthn->value:
                 try {
                     Webauthn::verifyAssertion(

@@ -31,6 +31,15 @@ return [
             'submit' => 'Verify',
         ],
 
+        'text' => [
+            'use_label' => 'Use your phone',
+            'heading' => 'Authentication code',
+            'help_text' => 'Please check your phone for SMS message containing the authentication code.',
+            'placeholder' => '6-digit code',
+            'invalid' => 'The code you entered is invalid.',
+            'submit' => 'Verify',
+        ],
+
         'webauthn' => [
             'use_label' => 'Use your security key',
             'use_label_including_passkeys' => 'Use your passkey or security key',

@@ -37,6 +37,7 @@ use Throwable;
  * @property-read string $alternativesHeading
  * @property-read string $formLabel
  * @property-read bool $isTotp
+ * @property-read bool $isText
  * @property-read bool $isWebauthn
  * @property-read null|\Rawilk\ProfileFilament\Enums\Livewire\MfaChallengeMode $mfaChallengeMode
  * @property-read string|null $modeIcon
@@ -72,6 +73,12 @@ class MfaChallenge extends SimplePage
     public function isTotp(): bool
     {
         return $this->mfaChallengeMode === MfaChallengeMode::App;
+    }
+
+    #[Computed]
+    public function isText(): bool
+    {
+        return $this->mfaChallengeMode === MfaChallengeMode::Text;
     }
 
     #[Computed]
@@ -321,6 +328,10 @@ class MfaChallenge extends SimplePage
             $options[] = MfaChallengeMode::App->value;
         }
 
+        if (Mfa::canUseTextOTPForChallenge($user)) {
+            $options[] = MfaChallengeMode::Text->value;
+        }
+
         if (Mfa::canUseWebauthnForChallenge($user)) {
             $options[] = MfaChallengeMode::Webauthn->value;
         }
@@ -351,6 +362,15 @@ class MfaChallenge extends SimplePage
             case MfaChallengeMode::App->value:
                 if (! Mfa::isValidTotpCode($data['code'])) {
                     $this->addError('code', __('profile-filament::pages/mfa.totp.invalid'));
+
+                    return false;
+                }
+
+                return true;
+
+            case MfaChallengeMode::Text->value:
+                if (! Mfa::isValidOtpCode($data['text'])) {
+                    $this->addError('code', __('profile-filament::pages/mfa.text.invalid'));
 
                     return false;
                 }

@@ -79,6 +79,40 @@ return [
             ],
         ],
 
+        'text' => [
+            'title' => 'SMS code',
+            'phone_number' => 'Phone number',
+            'default_number' => '+00000000',
+            'description' => 'Use an authentication app or browser extension to get two-factor authentication codes when prompted.',
+            'device_count' => ':count numbers|:count numbers',
+            'form_intro' => 'You can use your mobile phone number as a second factor to verify your identity when prompted during sign-in.',
+            'enter_code_instructions' => 'Please enter Your phone number you wish to use for authentication purposes and click Verify',
+            'code_confirmation_input' => 'Verify the code from received sms text',
+            'code_confirmation_placeholder' => '6-digit code',
+            'code_verification_fail' => 'SMS text code verification failed. Please try again.',
+            'code_verification_pass' => 'SMS text code verification was successful.',
+            'submit_code_confirmation' => 'Save',
+            'cancel_code_confirmation' => 'Cancel',
+            'phone_number_help' => 'Please enter valid phone number you have access to in order to receive sms text with code',
+            'add_button' => 'Add',
+            'add_another_text_button' => 'Register new phone number',
+            'verify_button' => 'Verify',
+            'show_button' => 'Edit',
+            'hide_button' => 'Hide',
+
+            'actions' => [
+
+                'delete' => [
+                    'trigger_tooltip' => 'Remove phone number',
+                    'trigger_label' => 'Delete :number',
+                    'title' => 'Delete phone number',
+                    'confirm' => 'Delete',
+                    'description' => 'You will no longer be able to use the **:number** phone number as a second form of authentication.',
+                    'success_message' => 'A phone number ":number" deleted.',
+                ],
+            ],
+        ],
+
         'webauthn' => [
             'title' => 'Security keys',
             'description' => 'Security keys are hardware devices that can be used as your second factor of authentication.',

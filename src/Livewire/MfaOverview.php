@@ -18,6 +18,7 @@ use Rawilk\ProfileFilament\Features;
 /**
  * @property-read \Illuminate\Support\Collection<int, \Rawilk\ProfileFilament\Models\AuthenticatorApp> $authenticatorApps
  * @property-read bool $canAuthenticatorApps
+ * @property-read bool $canTextOtps
  * @property-read bool $canWebauthn
  * @property-read bool $hasMfaEnabled
  * @property-read \Rawilk\ProfileFilament\Features $panelFeatures
@@ -33,6 +34,9 @@ class MfaOverview extends ProfileComponent
 
     #[Locked]
     public bool $showWebauthn = false;
+
+    #[Locked]
+    public bool $showTextOtpForm = false;
 
     public bool $showRecoveryCodes = false;
 
@@ -50,6 +54,12 @@ class MfaOverview extends ProfileComponent
     public function canAuthenticatorApps(): bool
     {
         return $this->panelFeatures->hasAuthenticatorApps();
+    }
+
+    #[Computed]
+    public function canTextOtps(): bool
+    {
+        return $this->panelFeatures->hasTextOTP();
     }
 
     #[Computed]
@@ -72,6 +82,19 @@ class MfaOverview extends ProfileComponent
     }
 
     #[Computed]
+    public function textOtps(): Collection
+    {
+        if (! $this->canTextOtps) {
+            return collect();
+        }
+
+        return filament()
+                   ->auth()
+                   ->user()
+                   ->textOtps ?? collect();
+    }
+
+    #[Computed]
     public function webauthnKeys(): Collection
     {
         if (! $this->canWebauthn) {
@@ -91,6 +114,7 @@ class MfaOverview extends ProfileComponent
     }
 
     #[On(MfaEvent::AppAdded->value)]
+    #[On(MfaEvent::TextAdded->value)]
     #[On(MfaEvent::WebauthnKeyAdded->value)]
     #[On(MfaEvent::PasskeyRegistered->value)]
     public function onMfaMethodAdded(bool $enabledMfa): void
@@ -107,15 +131,26 @@ class MfaOverview extends ProfileComponent
         $this->showAuthenticatorAppForm = false;
     }
 
+    #[On(MfaEvent::HideTextForm->value)]
+    public function hideTextForm(): void
+    {
+        $this->showTextOtpForm = false;
+    }
+
     #[On(MfaEvent::AppDeleted->value)]
+    #[On(MfaEvent::TextDeleted->value)]
     #[On(MfaEvent::WebauthnKeyDeleted->value)]
     #[On(MfaEvent::WebauthnKeyUpgradedToPasskey->value)]
     public function refreshStatuses(): void
     {
-        unset($this->hasMfaEnabled, $this->authenticatorApps, $this->webauthnKeys);
+        unset($this->hasMfaEnabled, $this->authenticatorApps, $this->textOtps, $this->webauthnKeys);
 
         if ($this->authenticatorApps->isEmpty()) {
             $this->showAuthenticatorAppForm = false;
+        }
+
+        if ($this->textOtps->isEmpty()) {
+            $this->showTextOtpForm = false;
         }
 
         if ($this->webauthnKeys->isEmpty()) {
@@ -126,6 +161,7 @@ class MfaOverview extends ProfileComponent
             $this->showRecoveryInModal = false;
             $this->showRecoveryCodes = false;
             $this->showAuthenticatorAppForm = false;
+            $this->showTextOtpForm = false;
             $this->showWebauthn = false;
         }
     }
@@ -165,6 +201,43 @@ class MfaOverview extends ProfileComponent
                     $this->ensureSudoIsActive(returnAction: 'toggleTotp');
                 }
             });
+    }
+
+    public function toggleTextAction(): Action
+    {
+        return Action::make('toggleText')
+                     ->label(function () {
+                         if (! $this->showTextOtpForm && $this->textOtps->isEmpty()) {
+                             return __('profile-filament::pages/security.mfa.text.add_button');
+                         }
+
+                         return $this->showTextOtpForm
+                             ? __('profile-filament::pages/security.mfa.text.hide_button')
+                             : __('profile-filament::pages/security.mfa.text.show_button');
+                     })
+                     ->color('gray')
+                     ->size('sm')
+                     ->disabled(function () {
+                         if ($this->textOtps->isNotEmpty()) {
+                             return false;
+                         }
+
+                         return $this->showTextOtpForm;
+                     })
+                     ->action(function () {
+                         if ($this->showTextOtpForm) {
+                             $this->showTextOtpForm = false;
+                             $this->dispatch(MfaEvent::HideTextList->value);
+                         } else {
+                             $this->showAuthenticatorAppForm = true;
+                             $this->dispatch(MfaEvent::ShowTextList->value);
+                         }
+                     })
+                     ->mountUsing(function () {
+                         if (! $this->showTextOtpForm && $this->textOtps->isEmpty()) {
+                             $this->ensureSudoIsActive(returnAction: 'toggleText');
+                         }
+                     });
     }
 
     public function toggleWebauthnAction(): Action
