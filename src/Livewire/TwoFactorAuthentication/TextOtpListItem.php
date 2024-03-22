@@ -29,8 +29,7 @@ class TextOtpListItem extends ProfileComponent
     public function deleteAction(): Action
     {
         return Action::make('delete')
-            ->label(__('profile-filament::pages/security.mfa.text.actions.delete.trigger_label', ['number' => e
-            ($this->phone->number)]))
+            ->label(__('profile-filament::pages/security.mfa.text.actions.delete.trigger_label', ['number' => $this->phone->number]))
             ->icon(FilamentIcon::resolve('actions::delete-action') ?? 'heroicon-o-trash')
             ->button()
             ->hiddenLabel()
@@ -46,9 +45,7 @@ class TextOtpListItem extends ProfileComponent
                 $deleter($this->phone);
 
                 Notification::make()
-                    ->title(__('profile-filament::pages/security.mfa.text.actions.delete.success_message', ['number'
-                                                                                                              => e
-                        ($this->phone->number)]))
+                    ->title(__('profile-filament::pages/security.mfa.text.actions.delete.success_message', ['number' =>$this->phone->number]))
                     ->success()
                     ->send();
 
@@ -62,7 +59,7 @@ class TextOtpListItem extends ProfileComponent
             ->modalDescription(
                 new HtmlString(
                     Str::inlineMarkdown(__('profile-filament::pages/security.mfa.text.actions.delete.description',
-                        ['name' => e($this->phone->number)]))
+                        ['number' => $this->phone->number]))
                 )
             )
             ->modalSubmitActionLabel(__('profile-filament::pages/security.mfa.text.actions.delete.confirm'))

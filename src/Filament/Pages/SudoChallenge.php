@@ -344,7 +344,7 @@ class SudoChallenge extends SimplePage
                 return true;
 
             case SudoChallengeMode::Text->value:
-                if (! Mfa::usingChallengedUser(filament()->auth()->user())->isValidOtpCode($data['text'] ?? '')) {
+                if (! Mfa::usingChallengedUser(filament()->auth()->user())->isValidOtpCode($data['code'] ?? '')) {
                     $this->error = __('profile-filament::messages.sudo_challenge.text.invalid');
 
                     return false;

@@ -10,6 +10,13 @@ return [
 
     'mfa_challenge' => [
         'invalid_challenged_user' => 'Your user account could not be verified.',
+        'text' => [
+            'code_message' => 'Your verification code: :code'
+        ]
+    ],
+
+    'text' => [
+        'code_sent' => 'Authentication code has been sent as text to phone number :number',
     ],
 
     'sudo_challenge' => [

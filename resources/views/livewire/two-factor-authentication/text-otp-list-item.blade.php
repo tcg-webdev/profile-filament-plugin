@@ -1,10 +1,10 @@
 <div class="py-3 flex justify-between items-center gap-x-3">
-    @if ($text)
+    @if ($phone)
         <div>
             <div>
-                <span>{{ $text->number }}</span>
+                <span>{{ $phone->number }}</span>
                 <span class="text-gray-500 dark:text-gray-400 text-xs">
-                    {{ $text->registered_at }}
+                    {{ $phone->registered_at }}
                 </span>
 
                 <x-filament-actions::modals />
@@ -12,7 +12,7 @@
 
             <div>
                 <span class="text-gray-500 dark:text-gray-400 text-xs">
-                    {{ $text->last_used }}
+                    {{ $phone->last_used }}
                 </span>
             </div>
         </div>

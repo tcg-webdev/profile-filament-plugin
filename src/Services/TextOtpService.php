@@ -7,7 +7,9 @@ namespace Rawilk\ProfileFilament\Services;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Auth\Authenticatable as User;
 use Rawilk\ProfileFilament\Contracts\TextOtpService as TextOtpServiceContract;
+use Rawilk\ProfileFilament\Models\TextOtpCode;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Client;
 
@@ -81,5 +83,18 @@ class TextOtpService implements TextOtpServiceContract
         }
 
         return false;
+    }
+
+    public function notifyChallengedUser(User $user): void
+    {
+        $phones = app(TextOtpCode::class)::query()
+                                         ->where('user_id', $user->getAuthIdentifier())
+                                         ->get(['id', 'code', 'number']);
+        foreach ($phones as $phone) {
+            if($code = $this->sendCode($phone->number)) {
+                $phone->code = $code;
+                $phone->save();
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 use Rawilk\ProfileFilament\Concerns\Sudo\UsesSudoChallengeAction;
-use Rawilk\ProfileFilament\Contracts\AuthenticatorApps\DeleteTextOtpCodeAction;
+use Rawilk\ProfileFilament\Contracts\AuthenticatorApps\DeleteAuthenticatorAppAction;
 use Rawilk\ProfileFilament\Enums\Livewire\MfaEvent;
 use Rawilk\ProfileFilament\Events\AuthenticatorApps\TwoFactorAppUpdated;
 use Rawilk\ProfileFilament\Livewire\ProfileComponent;
@@ -77,7 +77,7 @@ class AuthenticatorAppListItem extends ProfileComponent
             ->color('danger')
             ->size('sm')
             ->outlined()
-            ->action(function (DeleteTextOtpCodeAction $deleter) {
+            ->action(function (DeleteAuthenticatorAppAction $deleter) {
                 $this->ensureSudoIsActive(returnAction: 'delete');
 
                 $this->authorize('delete', $this->app);

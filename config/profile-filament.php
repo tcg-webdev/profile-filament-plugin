@@ -40,6 +40,7 @@ return [
         //Text otps
         'confirm_text_otp' => \Rawilk\ProfileFilament\Actions\TextOtps\ConfirmTwoFactorTextAction::class,
         'delete_text_otp' => \Rawilk\ProfileFilament\Actions\TextOtps\DeleteTwoFactorTextAction::class,
+        'verify_text_otp' => \Rawilk\ProfileFilament\Actions\TextOtps\VerifyTextOtpAction::class,
 
         // Webauthn
         'delete_webauthn_key' => \Rawilk\ProfileFilament\Actions\Webauthn\DeleteWebauthnKeyAction::class,
@@ -213,7 +214,7 @@ return [
         // token value from Twilio account
         'token' => '',
         // phone number you wish to use as phone number to send from
-        'senderPhoneNumber' => '',
+        'sender-phone-number' => '',
     ],
 
     /*

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Rawilk\ProfileFilament\Livewire\TwoFactorAuthentication;
 
 use Filament\Actions\Action;
+use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +23,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Reactive;
+use Rawilk\ProfileFilament\Actions\TextOtps\ConfirmTwoFactorTextAction;
 use Rawilk\ProfileFilament\Actions\TextOtps\VerifyTextOtpAction;
 use Rawilk\ProfileFilament\Concerns\Sudo\UsesSudoChallengeAction;
 use Rawilk\ProfileFilament\Contracts\AuthenticatorApps\ConfirmTwoFactorAppAction;
@@ -34,7 +36,7 @@ use Rawilk\ProfileFilament\Livewire\ProfileComponent;
  * @property-read \Rawilk\ProfileFilament\Contracts\TextOtpService $authenticatorService
  * @property-read bool $showCodeError
  * @property-read \Illuminate\Contracts\Auth\Authenticatable $user
- * @property-read \Illuminate\Support\Collection $sortedAuthenticatorApps
+ * @property-read \Illuminate\Support\Collection $sortedTextOtps
  * @property-read \Filament\Forms\Form $form
  */
 class TextOtpForm extends ProfileComponent
@@ -47,7 +49,6 @@ class TextOtpForm extends ProfileComponent
     #[Locked]
     public bool $showForm = false;
 
-    #[Locked]
     public string $code = '';
 
     public string $number= '';
@@ -127,7 +128,7 @@ class TextOtpForm extends ProfileComponent
         $action(filament()->auth()->user(), $data['number']);
     }
 
-    public function confirm(ConfirmTwoFactorAppAction $action): void
+    public function confirm(ConfirmTwoFactorTextAction $action): void
     {
         try {
             $this->ensureSudoIsActive(returnAction: 'add');
@@ -152,7 +153,7 @@ class TextOtpForm extends ProfileComponent
             /** @phpstan-ignore-next-line */
             $enabledMfa = ! $this->user->two_factor_enabled;
 
-            $action(filament()->auth()->user(), $data['number'], $this->code);
+            $action(filament()->auth()->user(), $data['number']);
 
             $this->cancelForm();
 
@@ -167,7 +168,7 @@ class TextOtpForm extends ProfileComponent
         return $form
             ->schema([
                 $this->getNumberField(),
-                $this->verifyAction(),
+                $this->verifyActionButton(),
                 $this->getCodeField(),
             ]);
     }
@@ -189,12 +190,14 @@ class TextOtpForm extends ProfileComponent
             });
     }
 
-    public function verifyAction(): Action
+    public function verifyActionButton(): Actions
     {
-        return Action::make('verify')
+        return Actions::make([
+            FormAction::make('verify')
                      ->color('green')
                      ->action(fn () => $this->verifyPhoneNumber())
-                     ->label(__('profile-filament::pages/security.mfa.text.verify_phone_number'));
+                     ->label(__('profile-filament::pages/security.mfa.text.verify_button')),
+            ]);
     }
 
     public function submitAction(): Action
@@ -245,6 +248,9 @@ class TextOtpForm extends ProfileComponent
             ->maxWidth('xs')
             ->autocomplete('off')
             ->debounce()
+            ->visible(function() {
+                return cache()->has(auth()->user()::hasTextValidationKey(auth()->user()));
+            })
             ->required()
             ->extraInputAttributes([
                 'pattern' => '[0-9]{6}',
@@ -265,16 +271,19 @@ class TextOtpForm extends ProfileComponent
     {
         $this->reset('code', 'number', 'showForm');
 
+        $user = filament()->auth()->user();
+        cache()->delete($user::hasTextValidationKey($user));
+
         if ($this->textOtps->isEmpty()) {
             $this->show = false;
-            $this->dispatch(MfaEvent::HideAppForm->value);
+            $this->dispatch(MfaEvent::HideTextForm->value);
         }
     }
 
     protected function isCodeValid(string $code): bool
     {
         $user = filament()->auth()->user();
-        $originalCode = cache()->get($user->hasTextValidationKey());
+        $originalCode = cache()->get($user::hasTextValidationKey($user));
 
         return $this->authenticatorService->verify(
             originalCode: $originalCode,

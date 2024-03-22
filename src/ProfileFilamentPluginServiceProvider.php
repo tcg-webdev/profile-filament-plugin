@@ -60,7 +60,7 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
 
         $this->app->scoped(
             Contracts\AuthenticatorAppService::class,
-            fn ($app) => new Filament\AuthenticatorAppService(
+            fn ($app) => new Services\AuthenticatorAppService(
                 engine: $app->make(Google2FA::class),
                 cache: $app->make(Cache::class),
             ),
@@ -68,9 +68,9 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
 
         $this->app->scoped(
             Contracts\TextOtpService::class,
-            fn ($app) => new Filament\TextOtpService(
-                client: $app->makeWith(Client::class, ['sid' => $app['config']['profile-filament.twilio.sid'],
-                                                       'token' => $app['config']['profile-filament.twilio.token']]),
+            fn ($app) => new Services\TextOtpService(
+                client: $app->makeWith(Client::class, ['username' => $app['config']['profile-filament.twilio.sid'],
+                                                       'password' => $app['config']['profile-filament.twilio.token']]),
                 senderPhoneNumber: $app['config']['profile-filament.twilio.sender-phone-number'],
             ),
         );
@@ -108,7 +108,12 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
 
         // Authenticator apps
         $this->app->bind(Contracts\AuthenticatorApps\ConfirmTwoFactorAppAction::class, fn ($app) => $app->make(config('profile-filament.actions.confirm_authenticator_app')));
-        $this->app->bind(Contracts\AuthenticatorApps\DeleteTextOtpCodeAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_authenticator_app')));
+        $this->app->bind(Contracts\AuthenticatorApps\DeleteAuthenticatorAppAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_authenticator_app')));
+
+        // text-otp
+        $this->app->bind(Contracts\TextOtps\ConfirmTwoFactorTextAction::class, fn ($app) => $app->make(config('profile-filament.actions.confirm_text_otp')));
+        $this->app->bind(Contracts\TextOtps\DeleteTextOtpCodeAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_text_otp')));
+        $this->app->bind(Contracts\TextOtps\VerifyTextOtpAction::class, fn ($app) => $app->make(config('profile-filament.actions.verify_text_otp')));
 
         // Webauthn
         $this->app->bind(Contracts\Webauthn\DeleteWebauthnKeyAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_webauthn_key')));
@@ -187,6 +192,8 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
         Livewire::component('recovery-codes', PackageLivewire\TwoFactorAuthentication\RecoveryCodes::class);
         Livewire::component('authenticator-app-form', PackageLivewire\TwoFactorAuthentication\AuthenticatorAppForm::class);
         Livewire::component('authenticator-app-list-item', PackageLivewire\TwoFactorAuthentication\AuthenticatorAppListItem::class);
+        Livewire::component('text-otp-form', PackageLivewire\TwoFactorAuthentication\TextOtpForm::class);
+        Livewire::component('text-otp-list-item', PackageLivewire\TwoFactorAuthentication\TextOtpListItem::class);
         Livewire::component('webauthn-keys', PackageLivewire\TwoFactorAuthentication\WebauthnKeys::class);
         Livewire::component('webauthn-key', PackageLivewire\TwoFactorAuthentication\WebauthnKey::class);
         Livewire::component('passkey', PackageLivewire\Passkey::class);

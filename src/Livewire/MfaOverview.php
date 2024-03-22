@@ -227,10 +227,10 @@ class MfaOverview extends ProfileComponent
                      ->action(function () {
                          if ($this->showTextOtpForm) {
                              $this->showTextOtpForm = false;
-                             $this->dispatch(MfaEvent::HideTextList->value);
+                             $this->dispatch(MfaEvent::HideTextForm->value);
                          } else {
-                             $this->showAuthenticatorAppForm = true;
-                             $this->dispatch(MfaEvent::ShowTextList->value);
+                             $this->showTextOtpForm = true;
+                             $this->dispatch(MfaEvent::ShowTextForm->value);
                          }
                      })
                      ->mountUsing(function () {

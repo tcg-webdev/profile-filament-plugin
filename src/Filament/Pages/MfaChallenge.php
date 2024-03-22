@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Timebox;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Rawilk\ProfileFilament\Contracts\TextOtpService as TextOtpServiceContract;
 use Rawilk\ProfileFilament\Dto\Auth\TwoFactorLoginEventBag;
 use Rawilk\ProfileFilament\Enums\Livewire\MfaChallengeMode;
 use Rawilk\ProfileFilament\Enums\Session\MfaSession;
@@ -155,6 +156,7 @@ class MfaChallenge extends SimplePage
 
         $this->challengeOptions = $this->getChallengeOptionsFor($user);
         $this->mode = ProfileFilament::preferredMfaMethodFor($user, $this->challengeOptions);
+        $this->initializeTextCode();
 
         $this->form->fill();
     }
@@ -243,9 +245,9 @@ class MfaChallenge extends SimplePage
     {
         return [
             TextInput::make('code')
-                ->placeholder($this->isTotp ? __('profile-filament::pages/mfa.totp.placeholder') : __('profile-filament::pages/mfa.recovery_code.placeholder'))
+                ->placeholder(($this->isTotp || $this->isText) ? __('profile-filament::pages/mfa.totp.placeholder') : __('profile-filament::pages/mfa.recovery_code.placeholder'))
                 ->label('')
-                ->autocomplete($this->isTotp ? 'one-time-code' : null)
+                ->autocomplete(($this->isTotp || $this->isText) ? 'one-time-code' : null)
                 ->helperText($this->isTotp ? __('profile-filament::pages/mfa.totp.hint') : __('profile-filament::pages/mfa.recovery_code.hint'))
                 ->required(fn () => ! $this->isWebauthn)
                 ->autofocus(),
@@ -369,7 +371,7 @@ class MfaChallenge extends SimplePage
                 return true;
 
             case MfaChallengeMode::Text->value:
-                if (! Mfa::isValidOtpCode($data['text'])) {
+                if (! Mfa::isValidOtpCode($data['code'])) {
                     $this->addError('code', __('profile-filament::pages/mfa.text.invalid'));
 
                     return false;
@@ -406,6 +408,13 @@ class MfaChallenge extends SimplePage
 
             default:
                 throw new Exception('Mfa method "' . $this->mode . '" is not supported by this package.');
+        }
+    }
+
+    private function initializeTextCode():void
+    {
+        if (MfaChallengeMode::Text->value === $this->mode) {
+            app(TextOtpServiceContract::class)->notifyChallengedUser(Mfa::challengedUser());
         }
     }
 }

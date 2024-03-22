@@ -155,7 +155,7 @@ class Mfa
     {
         $phones = app(TextOtpCode::class)::query()
                ->where('user_id', $this->challengedUser()->getAuthIdentifier())
-               ->get(['id', 'code']);
+               ->get(['id', 'code', 'number']);
 
         $shouldCreateNewOtpCode = true;
 
@@ -170,7 +170,7 @@ class Mfa
 
         if($shouldCreateNewOtpCode) {
             foreach ($phones as $phone) {
-                if($code = app(TextOtpServiceContract::class)->sendOtpCode($phone)) {
+                if($code = app(TextOtpServiceContract::class)->sendCode($phone->number)) {
                     $phone->code = $code;
                     $phone->save();
                 }

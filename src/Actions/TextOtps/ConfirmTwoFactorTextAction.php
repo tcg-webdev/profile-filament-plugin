@@ -30,7 +30,7 @@ class ConfirmTwoFactorTextAction implements ConfirmTwoFactorTextActionContract
             ])->save();
         });
 
-        cache()->delete($user->hasTextValidationKey());
+        cache()->forget($user::hasTextValidationKey($user));
 
         app(MarkTwoFactorEnabledAction::class)($user);
 
