@@ -58,7 +58,7 @@ trait CopiesRecoveryCodes
 
     public function printAction(): Action
     {
-        $url = Js::from(route('filament.' . filament()->getCurrentPanel()->getId() . '.auth.mfa.recovery-codes.print'));
+        $url = Js::from(route('filament.'.filament()->getCurrentPanel()->getId().'.auth.mfa.recovery-codes.print'));
 
         return Action::make('print')
             ->livewireClickHandlerEnabled(false)

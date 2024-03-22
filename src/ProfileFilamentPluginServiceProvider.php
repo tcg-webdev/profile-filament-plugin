@@ -43,7 +43,7 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
                 'create_authenticator_apps_table',
                 'create_webauthn_keys_table',
                 'create_pending_user_emails_table',
-                'create_text_otps_table'
+                'create_text_otps_table',
             ]);
     }
 
@@ -70,7 +70,7 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
             Contracts\TextOtpService::class,
             fn ($app) => new Services\TextOtpService(
                 client: $app->makeWith(Client::class, ['username' => $app['config']['profile-filament.twilio.sid'],
-                                                       'password' => $app['config']['profile-filament.twilio.token']]),
+                    'password' => $app['config']['profile-filament.twilio.token']]),
                 senderPhoneNumber: $app['config']['profile-filament.twilio.sender-phone-number'],
             ),
         );
@@ -136,13 +136,13 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
     private function registerAssets(): void
     {
         FilamentAsset::register([
-            AlpineComponent::make('webauthnForm', __DIR__ . '/../resources/dist/webauthn.js')
+            AlpineComponent::make('webauthnForm', __DIR__.'/../resources/dist/webauthn.js')
                 ->loadedOnRequest(),
         ], ProfileFilamentPlugin::PLUGIN_ID);
 
         FilamentAsset::register(
             assets: [
-                Css::make('profile-filament-plugin', __DIR__ . '/../resources/dist/plugin.css')->loadedOnRequest(),
+                Css::make('profile-filament-plugin', __DIR__.'/../resources/dist/plugin.css')->loadedOnRequest(),
             ],
             package: ProfileFilamentPlugin::PLUGIN_ID,
         );

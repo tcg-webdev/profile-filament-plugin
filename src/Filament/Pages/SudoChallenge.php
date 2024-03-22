@@ -224,7 +224,7 @@ class SudoChallenge extends SimplePage
         return [
             $this->isTotp
                 ? $this->getTotpInput()
-                : ($this->isText() ? $this->getTextInput() :$this->getPasswordInput()),
+                : ($this->isText() ? $this->getTextInput() : $this->getPasswordInput()),
         ];
     }
 
@@ -252,15 +252,16 @@ class SudoChallenge extends SimplePage
             ->autofocus()
             ->statePath('data.totp');
     }
+
     protected function getTextInput(): Component
     {
         return TextInput::make('code')
-                        ->hiddenLabel()
-                        ->placeholder(__('profile-filament::messages.sudo_challenge.totp.placeholder'))
-                        ->helperText(__('profile-filament::messages.sudo_challenge.text.help_text'))
-                        ->required()
-                        ->autofocus()
-                        ->statePath('data.text');
+            ->hiddenLabel()
+            ->placeholder(__('profile-filament::messages.sudo_challenge.totp.placeholder'))
+            ->helperText(__('profile-filament::messages.sudo_challenge.text.help_text'))
+            ->required()
+            ->autofocus()
+            ->statePath('data.text');
     }
 
     protected function getFormActions(): array
@@ -377,7 +378,7 @@ class SudoChallenge extends SimplePage
                 return true;
 
             default:
-                throw new Exception('Sudo challenge mode "' . $this->sudoChallengeMode . '" is not supported by this package.');
+                throw new Exception('Sudo challenge mode "'.$this->sudoChallengeMode.'" is not supported by this package.');
         }
     }
 }

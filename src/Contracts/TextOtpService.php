@@ -1,6 +1,7 @@
 <?php
 
 namespace Rawilk\ProfileFilament\Contracts;
+
 use Illuminate\Contracts\Auth\Authenticatable as User;
 
 interface TextOtpService
@@ -11,5 +12,5 @@ interface TextOtpService
 
     public function sendCode(string $phoneNumber): mixed;
 
-    public function notifyChallengedUser(User $user):void;
+    public function notifyChallengedUser(User $user): void;
 }

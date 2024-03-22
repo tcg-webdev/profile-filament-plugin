@@ -6,7 +6,6 @@ namespace Rawilk\ProfileFilament\Events\TextOtps;
 
 use Illuminate\Contracts\Auth\Authenticatable as User;
 use Rawilk\ProfileFilament\Events\ProfileFilamentEvent;
-use Rawilk\ProfileFilament\Models\AuthenticatorApp;
 use Rawilk\ProfileFilament\Models\TextOtpCode;
 
 final class TwoFactorTextUsed extends ProfileFilamentEvent

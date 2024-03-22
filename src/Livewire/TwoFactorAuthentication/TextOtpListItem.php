@@ -5,19 +5,14 @@ declare(strict_types=1);
 namespace Rawilk\ProfileFilament\Livewire\TwoFactorAuthentication;
 
 use Filament\Actions\Action;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Unique;
 use Rawilk\ProfileFilament\Concerns\Sudo\UsesSudoChallengeAction;
 use Rawilk\ProfileFilament\Contracts\TextOtps\DeleteTextOtpCodeAction;
 use Rawilk\ProfileFilament\Enums\Livewire\MfaEvent;
-use Rawilk\ProfileFilament\Events\AuthenticatorApps\TwoFactorAppUpdated;
 use Rawilk\ProfileFilament\Livewire\ProfileComponent;
-use Rawilk\ProfileFilament\Models\AuthenticatorApp;
 use Rawilk\ProfileFilament\Models\TextOtpCode;
 
 class TextOtpListItem extends ProfileComponent
@@ -45,7 +40,7 @@ class TextOtpListItem extends ProfileComponent
                 $deleter($this->phone);
 
                 Notification::make()
-                    ->title(__('profile-filament::pages/security.mfa.text.actions.delete.success_message', ['number' =>$this->phone->number]))
+                    ->title(__('profile-filament::pages/security.mfa.text.actions.delete.success_message', ['number' => $this->phone->number]))
                     ->success()
                     ->send();
 

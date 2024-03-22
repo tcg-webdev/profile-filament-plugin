@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Rawilk\ProfileFilament\Services;
 
-use Illuminate\Contracts\Cache\Repository as Cache;
-
-use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Auth\Authenticatable as User;
+use Illuminate\Support\Facades\Log;
 use Rawilk\ProfileFilament\Contracts\TextOtpService as TextOtpServiceContract;
 use Rawilk\ProfileFilament\Models\TextOtpCode;
 use Twilio\Exceptions\TwilioException;
@@ -42,7 +40,6 @@ class TextOtpService implements TextOtpServiceContract
         return $otpCode;
     }
 
-
     private function generateRandomString(string $characters, int $length): string
     {
         $charactersLength = strlen($characters);
@@ -56,7 +53,6 @@ class TextOtpService implements TextOtpServiceContract
         return $randomString;
     }
 
-
     private function getRandomNonZeroCharacter(string $characters): string
     {
         $nonZeroCharacters = trim($characters, '0');
@@ -69,7 +65,7 @@ class TextOtpService implements TextOtpServiceContract
         $code = $this->generateSecretKey();
         try {
             $this->client->messages->create(
-            // The number you'd like to send the message to
+                // The number you'd like to send the message to
                 $phoneNumber,
                 [
                     'from' => $this->senderPhoneNumber,
@@ -78,7 +74,7 @@ class TextOtpService implements TextOtpServiceContract
             );
 
             return $code;
-        } catch(TwilioException $ex) {
+        } catch (TwilioException $ex) {
             Log::error($ex->getMessage());
         }
 
@@ -88,10 +84,10 @@ class TextOtpService implements TextOtpServiceContract
     public function notifyChallengedUser(User $user): void
     {
         $phones = app(TextOtpCode::class)::query()
-                                         ->where('user_id', $user->getAuthIdentifier())
-                                         ->get(['id', 'code', 'number']);
+            ->where('user_id', $user->getAuthIdentifier())
+            ->get(['id', 'code', 'number']);
         foreach ($phones as $phone) {
-            if($code = $this->sendCode($phone->number)) {
+            if ($code = $this->sendCode($phone->number)) {
                 $phone->code = $code;
                 $phone->save();
             }

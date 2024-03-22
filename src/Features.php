@@ -85,7 +85,7 @@ final class Features
 
         /** @phpstan-ignore-next-line */
         if (! is_callable($callback) && ! $callback instanceof self) {
-            throw new InvalidArgumentException('The given callback should be callable or an instance of ' . self::class);
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.self::class);
         }
 
         self::$defaultCallback = $callback;

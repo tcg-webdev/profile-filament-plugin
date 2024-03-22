@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Rawilk\ProfileFilament\Actions\TextOtps;
 
 use Illuminate\Contracts\Auth\Authenticatable as User;
-use Rawilk\ProfileFilament\Contracts\TextOtps\ConfirmTwoFactorTextAction as
-    ConfirmTwoFactorTextActionContract;
+use Rawilk\ProfileFilament\Contracts\TextOtps\ConfirmTwoFactorTextAction as ConfirmTwoFactorTextActionContract;
 use Rawilk\ProfileFilament\Contracts\TwoFactor\MarkTwoFactorEnabledAction;
 use Rawilk\ProfileFilament\Events\TextOtps\TwoFactorTextAdded;
 use Rawilk\ProfileFilament\Models\TextOtpCode;

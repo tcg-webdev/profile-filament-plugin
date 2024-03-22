@@ -407,11 +407,11 @@ class MfaChallenge extends SimplePage
                 return true;
 
             default:
-                throw new Exception('Mfa method "' . $this->mode . '" is not supported by this package.');
+                throw new Exception('Mfa method "'.$this->mode.'" is not supported by this package.');
         }
     }
 
-    private function initializeTextCode():void
+    private function initializeTextCode(): void
     {
         if (MfaChallengeMode::Text->value === $this->mode) {
             app(TextOtpServiceContract::class)->notifyChallengedUser(Mfa::challengedUser());

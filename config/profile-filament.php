@@ -209,12 +209,11 @@ return [
      */
 
     'twilio' => [
-        // sid value from Twilio account
-        'sid' => '',
+        'sid' => env('TWILIO_SID', ''),
         // token value from Twilio account
-        'token' => '',
+        'token' => env('TWILIO_TOKEN', ''),
         // phone number you wish to use as phone number to send from
-        'sender-phone-number' => '',
+        'sender-phone-number' => env('TWILIO_PHONE_NUMBER', ''),
     ],
 
     /*

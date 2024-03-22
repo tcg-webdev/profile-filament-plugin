@@ -15,8 +15,6 @@ use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Js;
 use Illuminate\Support\Timebox;
 use Illuminate\Validation\Rules\Unique;
 use Livewire\Attributes\Computed;
@@ -26,8 +24,6 @@ use Livewire\Attributes\Reactive;
 use Rawilk\ProfileFilament\Actions\TextOtps\ConfirmTwoFactorTextAction;
 use Rawilk\ProfileFilament\Actions\TextOtps\VerifyTextOtpAction;
 use Rawilk\ProfileFilament\Concerns\Sudo\UsesSudoChallengeAction;
-use Rawilk\ProfileFilament\Contracts\AuthenticatorApps\ConfirmTwoFactorAppAction;
-use Rawilk\ProfileFilament\Contracts\AuthenticatorAppService;
 use Rawilk\ProfileFilament\Contracts\TextOtpService;
 use Rawilk\ProfileFilament\Enums\Livewire\MfaEvent;
 use Rawilk\ProfileFilament\Livewire\ProfileComponent;
@@ -51,7 +47,7 @@ class TextOtpForm extends ProfileComponent
 
     public string $code = '';
 
-    public string $number= '';
+    public string $number = '';
 
     #[Locked]
     public bool $codeValid = false;
@@ -107,16 +103,15 @@ class TextOtpForm extends ProfileComponent
         $this->showForm = true;
     }
 
-
-    public function verifyPhoneNumber():void
+    public function verifyPhoneNumber(): void
     {
         try {
             $this->ensureSudoIsActive(returnAction: 'add');
         } catch (Halt) {
             Notification::make()
-                        ->danger()
-                        ->title(__('profile-filament::messages.sudo_challenge.expired'))
-                        ->send();
+                ->danger()
+                ->title(__('profile-filament::messages.sudo_challenge.expired'))
+                ->send();
 
             return;
         }
@@ -194,10 +189,10 @@ class TextOtpForm extends ProfileComponent
     {
         return Actions::make([
             FormAction::make('verify')
-                     ->color('green')
-                     ->action(fn () => $this->verifyPhoneNumber())
-                     ->label(__('profile-filament::pages/security.mfa.text.verify_button')),
-            ]);
+                ->color('green')
+                ->action(fn () => $this->verifyPhoneNumber())
+                ->label(__('profile-filament::pages/security.mfa.text.verify_button')),
+        ]);
     }
 
     public function submitAction(): Action
@@ -248,7 +243,7 @@ class TextOtpForm extends ProfileComponent
             ->maxWidth('xs')
             ->autocomplete('off')
             ->debounce()
-            ->visible(function() {
+            ->visible(function () {
                 return cache()->has(auth()->user()::hasTextValidationKey(auth()->user()));
             })
             ->required()
@@ -265,7 +260,6 @@ class TextOtpForm extends ProfileComponent
                 $this->ensureCodeIsValid($state);
             });
     }
-
 
     protected function cancelForm(): void
     {

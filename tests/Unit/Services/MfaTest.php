@@ -67,7 +67,7 @@ it('can confirm a user mfa session', function () {
     $this->mfa->confirmUserSession($this->user);
 
     expect(session()->has(MfaSession::User->value))->toBeFalse()
-        ->and(session()->get(MfaSession::Confirmed->value . '.1'))->toBeTrue();
+        ->and(session()->get(MfaSession::Confirmed->value.'.1'))->toBeTrue();
 });
 
 it('knows if a user session has been mfa confirmed', function () {

@@ -89,9 +89,9 @@ class MfaOverview extends ProfileComponent
         }
 
         return filament()
-                   ->auth()
-                   ->user()
-                   ->textOtps ?? collect();
+            ->auth()
+            ->user()
+            ->textOtps ?? collect();
     }
 
     #[Computed]
@@ -206,38 +206,38 @@ class MfaOverview extends ProfileComponent
     public function toggleTextAction(): Action
     {
         return Action::make('toggleText')
-                     ->label(function () {
-                         if (! $this->showTextOtpForm && $this->textOtps->isEmpty()) {
-                             return __('profile-filament::pages/security.mfa.text.add_button');
-                         }
+            ->label(function () {
+                if (! $this->showTextOtpForm && $this->textOtps->isEmpty()) {
+                    return __('profile-filament::pages/security.mfa.text.add_button');
+                }
 
-                         return $this->showTextOtpForm
-                             ? __('profile-filament::pages/security.mfa.text.hide_button')
-                             : __('profile-filament::pages/security.mfa.text.show_button');
-                     })
-                     ->color('gray')
-                     ->size('sm')
-                     ->disabled(function () {
-                         if ($this->textOtps->isNotEmpty()) {
-                             return false;
-                         }
+                return $this->showTextOtpForm
+                    ? __('profile-filament::pages/security.mfa.text.hide_button')
+                    : __('profile-filament::pages/security.mfa.text.show_button');
+            })
+            ->color('gray')
+            ->size('sm')
+            ->disabled(function () {
+                if ($this->textOtps->isNotEmpty()) {
+                    return false;
+                }
 
-                         return $this->showTextOtpForm;
-                     })
-                     ->action(function () {
-                         if ($this->showTextOtpForm) {
-                             $this->showTextOtpForm = false;
-                             $this->dispatch(MfaEvent::HideTextForm->value);
-                         } else {
-                             $this->showTextOtpForm = true;
-                             $this->dispatch(MfaEvent::ShowTextForm->value);
-                         }
-                     })
-                     ->mountUsing(function () {
-                         if (! $this->showTextOtpForm && $this->textOtps->isEmpty()) {
-                             $this->ensureSudoIsActive(returnAction: 'toggleText');
-                         }
-                     });
+                return $this->showTextOtpForm;
+            })
+            ->action(function () {
+                if ($this->showTextOtpForm) {
+                    $this->showTextOtpForm = false;
+                    $this->dispatch(MfaEvent::HideTextForm->value);
+                } else {
+                    $this->showTextOtpForm = true;
+                    $this->dispatch(MfaEvent::ShowTextForm->value);
+                }
+            })
+            ->mountUsing(function () {
+                if (! $this->showTextOtpForm && $this->textOtps->isEmpty()) {
+                    $this->ensureSudoIsActive(returnAction: 'toggleText');
+                }
+            });
     }
 
     public function toggleWebauthnAction(): Action

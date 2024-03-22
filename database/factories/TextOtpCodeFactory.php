@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Rawilk\ProfileFilament\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use PragmaRX\Google2FA\Google2FA;
-use Rawilk\ProfileFilament\Models\AuthenticatorApp;
 use Rawilk\ProfileFilament\Models\TextOtpCode;
 
 /**

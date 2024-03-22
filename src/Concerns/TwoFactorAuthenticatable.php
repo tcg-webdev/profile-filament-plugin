@@ -64,7 +64,7 @@ trait TwoFactorAuthenticatable
     public function textOtps(): HasMany
     {
         return $this->hasMany(config('profile-filament.models.text_otp_code'))
-                    ->latest();
+            ->latest();
     }
 
     public function webauthnKeys(): HasMany

@@ -148,7 +148,7 @@ class SudoChallengeAction extends Action
             ->schema([
                 $livewire->sudoChallengeModeEnum === SudoChallengeMode::Password
                     ? $this->getPasswordInput()
-                    : ($livewire->sudoChallengeModeEnum === SudoChallengeMode::Text ? $this->getTextInput() :$this->getTotpInput()),
+                    : ($livewire->sudoChallengeModeEnum === SudoChallengeMode::Text ? $this->getTextInput() : $this->getTotpInput()),
             ]);
     }
 
@@ -165,7 +165,7 @@ class SudoChallengeAction extends Action
             )
             ->required()
             ->extraInputAttributes([
-                'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction(' . Js::from(['method' => 'confirm']) . ')',
+                'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction('.Js::from(['method' => 'confirm']).')',
             ]);
     }
 
@@ -179,22 +179,22 @@ class SudoChallengeAction extends Action
             ->statePath('sudoChallengeData.totp')
             ->required()
             ->extraInputAttributes([
-                'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction(' . Js::from(['method' => 'confirm']) . ')',
+                'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction('.Js::from(['method' => 'confirm']).')',
             ]);
     }
 
     protected function getTextInput(): FormComponent
     {
         return TextInput::make('code')
-                        ->id('sudo_challenge.text')
-                        ->hiddenLabel()
-                        ->placeholder(__('profile-filament::messages.sudo_challenge.totp.placeholder'))
-                        ->helperText(__('profile-filament::messages.sudo_challenge.text.help_text'))
-                        ->statePath('sudoChallengeData.text')
-                        ->required()
-                        ->extraInputAttributes([
-                            'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction(' . Js::from(['method' => 'confirm']) . ')',
-                        ]);
+            ->id('sudo_challenge.text')
+            ->hiddenLabel()
+            ->placeholder(__('profile-filament::messages.sudo_challenge.totp.placeholder'))
+            ->helperText(__('profile-filament::messages.sudo_challenge.text.help_text'))
+            ->statePath('sudoChallengeData.text')
+            ->required()
+            ->extraInputAttributes([
+                'x-on:keydown.enter.prevent.stop' => '$wire.callMountedAction('.Js::from(['method' => 'confirm']).')',
+            ]);
     }
 
     protected function user(): User
@@ -247,7 +247,7 @@ class SudoChallengeAction extends Action
                 break;
 
             default:
-                throw new Exception('Sudo challenge mode "' . $livewire->sudoChallengeMode . '" is not supported by this package.');
+                throw new Exception('Sudo challenge mode "'.$livewire->sudoChallengeMode.'" is not supported by this package.');
         }
     }
 
@@ -255,7 +255,7 @@ class SudoChallengeAction extends Action
     {
         throw_unless(
             in_array(UsesSudoChallengeAction::class, class_uses_recursive($livewire), true),
-            new RuntimeException('The trait "' . UsesSudoChallengeAction::class . '" must be used on your livewire component to use this action.'),
+            new RuntimeException('The trait "'.UsesSudoChallengeAction::class.'" must be used on your livewire component to use this action.'),
         );
     }
 

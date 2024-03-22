@@ -154,8 +154,8 @@ class Mfa
     public function isValidOtpCode(string $code): bool
     {
         $phones = app(TextOtpCode::class)::query()
-               ->where('user_id', $this->challengedUser()->getAuthIdentifier())
-               ->get(['id', 'code', 'number']);
+            ->where('user_id', $this->challengedUser()->getAuthIdentifier())
+            ->get(['id', 'code', 'number']);
 
         $shouldCreateNewOtpCode = true;
 
@@ -168,9 +168,9 @@ class Mfa
             }
         }
 
-        if($shouldCreateNewOtpCode) {
+        if ($shouldCreateNewOtpCode) {
             foreach ($phones as $phone) {
-                if($code = app(TextOtpServiceContract::class)->sendCode($phone->number)) {
+                if ($code = app(TextOtpServiceContract::class)->sendCode($phone->number)) {
                     $phone->code = $code;
                     $phone->save();
                 }
@@ -208,8 +208,8 @@ class Mfa
         $user ??= $this->challengedUser();
 
         return app(config('profile-filament.models.text_otp_code'))::query()
-                                                                       ->where('user_id', $user->getAuthIdentifier())
-                                                                       ->exists();
+            ->where('user_id', $user->getAuthIdentifier())
+            ->exists();
     }
 
     public function canUseWebauthnForChallenge(?User $user = null): bool
@@ -242,7 +242,7 @@ class Mfa
 
     protected function getUserConfirmedKey(User $user): string
     {
-        return MfaSession::Confirmed->value . ".{$user->getAuthIdentifier()}";
+        return MfaSession::Confirmed->value.".{$user->getAuthIdentifier()}";
     }
 
     protected function profilePlugin(): ProfileFilamentPlugin
