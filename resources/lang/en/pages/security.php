@@ -35,7 +35,7 @@ return [
             'title' => 'Authenticator app',
             'description' => 'Use an authentication app or browser extension to get two-factor authentication codes when prompted.',
             'device_count' => ':count app|:count apps',
-            'form_intro' => 'Authenticator apps and browser extensions like [1Password](:one_password), [Authy](:authy), [Microsoft Authenticator](:microsoft), etc. generate one-time passwords that are used as a second factor to verify your identity when prompted during sign-in.',
+            'form_intro' => 'Authenticator apps and browser extensions like <a href=":google" target="_blank">Google Authenticator</a>, <a href=":one_password" target="_blank">1Password</a>, <a href=":authy" target="_blank">Authy</a>, <a href=":microsoft" target="_blank">Microsoft Authenticator</a>, etc. generate one-time passwords that are used as a second factor to verify your identity when prompted during sign-in.',
             'scan_title' => 'Scan the QR code',
             'scan_instructions' => 'Use an authenticator app or browser extension to scan the QR code below.',
             'enter_code_instructions' => 'If you are not able to scan the QR code, you can manually enter your secret key into your authenticator app.',

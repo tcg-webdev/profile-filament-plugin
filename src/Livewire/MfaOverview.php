@@ -178,7 +178,7 @@ class MfaOverview extends ProfileComponent
                     ? __('profile-filament::pages/security.mfa.app.hide_button')
                     : __('profile-filament::pages/security.mfa.app.show_button');
             })
-            ->color('gray')
+            ->color('white')
             ->size('sm')
             ->disabled(function () {
                 if ($this->authenticatorApps->isNotEmpty()) {
@@ -215,7 +215,7 @@ class MfaOverview extends ProfileComponent
                     ? __('profile-filament::pages/security.mfa.text.hide_button')
                     : __('profile-filament::pages/security.mfa.text.show_button');
             })
-            ->color('gray')
+            ->color('white')
             ->size('sm')
             ->disabled(function () {
                 if ($this->textOtps->isNotEmpty()) {
@@ -252,7 +252,7 @@ class MfaOverview extends ProfileComponent
                     ? __('profile-filament::pages/security.mfa.webauthn.hide_button')
                     : __('profile-filament::pages/security.mfa.webauthn.show_button');
             })
-            ->color('gray')
+            ->color('white')
             ->size('sm')
             ->action(function () {
                 $this->showWebauthn = ! $this->showWebauthn;
@@ -270,7 +270,7 @@ class MfaOverview extends ProfileComponent
     {
         return Action::make('toggleRecoveryCodes')
             ->label(fn () => $this->showRecoveryCodes ? __('profile-filament::pages/security.mfa.recovery_codes.hide_button') : __('profile-filament::pages/security.mfa.recovery_codes.show_button'))
-            ->color('gray')
+            ->color('white')
             ->disabled(fn () => ! $this->hasMfaEnabled)
             ->tooltip(fn () => $this->hasMfaEnabled ? null : __('profile-filament::pages/security.mfa.recovery_codes.mfa_disabled'))
             ->size('sm')
