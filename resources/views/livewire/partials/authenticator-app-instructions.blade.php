@@ -1,6 +1,6 @@
 <div class="mt-4">
     <p>
-        {{ \Rawilk\ProfileFilament\renderMarkdown(__('profile-filament::pages/security.mfa.app.form_intro', ['authy' => 'https://authy.com/guides/', 'microsoft' => 'https://www.microsoft.com/en-us/account/authenticator/', 'one_password' => 'https://support.1password.com/one-time-passwords/'])) }}
+        {{ \Rawilk\ProfileFilament\renderMarkdown(__('profile-filament::pages/security.mfa.app.form_intro', ['google' => 'https://support.google.com/accounts/answer/1066447?hl=en&co=GENIE.Platform%3DAndroid','authy' => 'https://authy.com/guides/', 'microsoft' => 'https://www.microsoft.com/en-us/account/authenticator/', 'one_password' => 'https://support.1password.com/one-time-passwords/'])) }}
     </p>
 
     <p class="mt-3 font-bold dark:text-white text-gray-600">{{ __('profile-filament::pages/security.mfa.app.scan_title') }}</p>

@@ -26,8 +26,10 @@
         "illuminate/contracts": "^10.10|^11.0",
         "mobiledetect/mobiledetectlib": "^4.8",
         "pragmarx/google2fa": "^8.0",
+        "propaganistas/laravel-phone": "^5.2",
         "rawilk/filament-password-input": "^2.0",
         "spatie/laravel-package-tools": "^1.14",
+        "twilio/sdk": "^7.16",
         "web-auth/webauthn-lib": "^4.7.7"
     },
     "require-dev": {

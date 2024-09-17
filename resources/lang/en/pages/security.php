@@ -35,7 +35,7 @@ return [
             'title' => 'Authenticator app',
             'description' => 'Use an authentication app or browser extension to get two-factor authentication codes when prompted.',
             'device_count' => ':count app|:count apps',
-            'form_intro' => 'Authenticator apps and browser extensions like [1Password](:one_password), [Authy](:authy), [Microsoft Authenticator](:microsoft), etc. generate one-time passwords that are used as a second factor to verify your identity when prompted during sign-in.',
+            'form_intro' => 'Authenticator apps and browser extensions like <a href=":google" target="_blank">Google Authenticator</a>, <a href=":one_password" target="_blank">1Password</a>, <a href=":authy" target="_blank">Authy</a>, <a href=":microsoft" target="_blank">Microsoft Authenticator</a>, etc. generate one-time passwords that are used as a second factor to verify your identity when prompted during sign-in.',
             'scan_title' => 'Scan the QR code',
             'scan_instructions' => 'Use an authenticator app or browser extension to scan the QR code below.',
             'enter_code_instructions' => 'If you are not able to scan the QR code, you can manually enter your secret key into your authenticator app.',
@@ -76,6 +76,40 @@ return [
                     'success_message' => 'Authenticator app was updated successfully.',
                 ],
 
+            ],
+        ],
+
+        'text' => [
+            'title' => 'SMS code',
+            'phone_number' => 'Phone number',
+            'default_number' => '+00000000',
+            'description' => 'Enter 6-digit code from received SMS text when prompted during sign-in',
+            'device_count' => ':count number|:count numbers',
+            'form_intro' => 'You can use your mobile phone number as a second factor to verify your identity when prompted during sign-in.',
+            'enter_code_instructions' => 'Please enter Your phone number you wish to use for authentication purposes and click Verify',
+            'code_confirmation_input' => 'Verify the code from received sms text',
+            'code_confirmation_placeholder' => '6-digit code',
+            'code_verification_fail' => 'SMS text code verification failed. Please try again.',
+            'code_verification_pass' => 'SMS text code verification was successful.',
+            'submit_code_confirmation' => 'Save',
+            'cancel_code_confirmation' => 'Cancel',
+            'phone_number_help' => 'Please enter valid phone number you have access to in order to receive sms text with code',
+            'add_button' => 'Add',
+            'add_another_text_button' => 'Register new phone number',
+            'verify_button' => 'Verify',
+            'show_button' => 'Edit',
+            'hide_button' => 'Hide',
+
+            'actions' => [
+
+                'delete' => [
+                    'trigger_tooltip' => 'Remove phone number',
+                    'trigger_label' => 'Delete :number',
+                    'title' => 'Delete phone number',
+                    'confirm' => 'Delete',
+                    'description' => 'You will no longer be able to use the **:number** phone number as a second form of authentication.',
+                    'success_message' => 'A phone number ":number" deleted.',
+                ],
             ],
         ],
 

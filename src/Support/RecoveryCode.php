@@ -29,6 +29,6 @@ class RecoveryCode
             return call_user_func(static::$generateCodesUsingCallback);
         }
 
-        return Str::random(10) . '-' . Str::random(10);
+        return Str::random(10).'-'.Str::random(10);
     }
 }

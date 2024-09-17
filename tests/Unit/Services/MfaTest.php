@@ -11,6 +11,7 @@ use Rawilk\ProfileFilament\Events\AuthenticatorApps\TwoFactorAppUsed;
 use Rawilk\ProfileFilament\Events\RecoveryCodeReplaced;
 use Rawilk\ProfileFilament\Events\TwoFactorAuthenticationChallenged;
 use Rawilk\ProfileFilament\Models\AuthenticatorApp;
+use Rawilk\ProfileFilament\Models\TextOtpCode;
 use Rawilk\ProfileFilament\Models\WebauthnKey;
 use Rawilk\ProfileFilament\Services\Mfa;
 use Rawilk\ProfileFilament\Tests\Fixtures\Models\User;
@@ -66,7 +67,7 @@ it('can confirm a user mfa session', function () {
     $this->mfa->confirmUserSession($this->user);
 
     expect(session()->has(MfaSession::User->value))->toBeFalse()
-        ->and(session()->get(MfaSession::Confirmed->value . '.1'))->toBeTrue();
+        ->and(session()->get(MfaSession::Confirmed->value.'.1'))->toBeTrue();
 });
 
 it('knows if a user session has been mfa confirmed', function () {
@@ -163,6 +164,14 @@ it('knows if a user has totp apps registered', function () {
     AuthenticatorApp::factory()->for($this->user)->create();
 
     expect($this->mfa->canUseAuthenticatorAppsForChallenge($this->user))->toBeTrue();
+});
+
+it('knows if a user has text otps registered', function () {
+    expect($this->mfa->canUseTextOTPForChallenge($this->user))->toBeFalse();
+
+    TextOtpCode::factory()->for($this->user)->create();
+
+    expect($this->mfa->canUseTextOTPForChallenge($this->user))->toBeTrue();
 });
 
 it('knows if a user has webauthn keys registered', function () {

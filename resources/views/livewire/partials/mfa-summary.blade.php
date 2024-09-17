@@ -27,6 +27,26 @@
             />
         </x-profile-filament::box-row>
     @endif
+    @if ($this->canTextOtps)
+        <x-profile-filament::box-row
+            icon="heroicon-o-chat-bubble-left-ellipsis"
+            icon-alias="mfa::phone"
+            id="texts-list-container"
+            device-count-translation="profile-filament::pages/security.mfa.text.device_count"
+            :label="__('profile-filament::pages/security.mfa.text.title')"
+            :description="__('profile-filament::pages/security.mfa.text.description')"
+            :device-count="$this->textOtps->count()"
+        >
+            <x-slot:button>
+                {{ $this->toggleTextAction }}
+            </x-slot:button>
+
+            <livewire:text-otp-form
+                :show="$showTextOtpForm"
+                :textOtps="$this->textOtps"
+            />
+        </x-profile-filament::box-row>
+    @endif
 
     @if ($this->canWebauthn)
         <x-profile-filament::box-row

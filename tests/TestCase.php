@@ -26,14 +26,14 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Rawilk\\ProfileFilament\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Rawilk\\ProfileFilament\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
 
         // copy icon sets over to vendor directory
         try {
             File::copyDirectory(
-                directory: __DIR__ . '/../resources/svg',
-                destination: __DIR__ . '/../vendor/orchestra/testbench-core/laravel/vendor/rawilk/profile-filament-plugin/resources/svg',
+                directory: __DIR__.'/../resources/svg',
+                destination: __DIR__.'/../vendor/orchestra/testbench-core/laravel/vendor/rawilk/profile-filament-plugin/resources/svg',
             );
         } catch (Throwable) {
         }
@@ -51,11 +51,11 @@ class TestCase extends Orchestra
         $app['config']->set('profile-filament.webauthn.relying_party.id', 'https://acme.test');
 
         $migrations = [
-            __DIR__ . '/Fixtures/database/migrations/create_users_table.php',
-            __DIR__ . '/../database/migrations/add_two_factor_to_users_table.php.stub',
-            __DIR__ . '/../database/migrations/create_authenticator_apps_table.php.stub',
-            __DIR__ . '/../database/migrations/create_pending_user_emails_table.php.stub',
-            __DIR__ . '/../database/migrations/create_webauthn_keys_table.php.stub',
+            __DIR__.'/Fixtures/database/migrations/create_users_table.php',
+            __DIR__.'/../database/migrations/add_two_factor_to_users_table.php.stub',
+            __DIR__.'/../database/migrations/create_authenticator_apps_table.php.stub',
+            __DIR__.'/../database/migrations/create_pending_user_emails_table.php.stub',
+            __DIR__.'/../database/migrations/create_webauthn_keys_table.php.stub',
         ];
 
         foreach ($migrations as $migration) {

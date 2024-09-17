@@ -26,7 +26,7 @@ class RequiresTwoFactorAuthentication
         $user = filament()->auth()->user();
         throw_unless(
             in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user), true),
-            new RuntimeException('User class [' . $user::class . '] must use the trait ' . TwoFactorAuthenticatable::class),
+            new RuntimeException('User class ['.$user::class.'] must use the trait '.TwoFactorAuthenticatable::class),
         );
 
         if (! $this->userHasMfaEnabled($user)) {

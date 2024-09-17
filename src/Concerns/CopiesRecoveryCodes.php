@@ -30,7 +30,7 @@ trait CopiesRecoveryCodes
 
         return Action::make('copy')
             ->livewireClickHandlerEnabled(false)
-            ->color('gray')
+            ->color('white')
             ->label(__('profile-filament::pages/security.mfa.recovery_codes.actions.copy.label'))
             ->icon(FilamentIcon::resolve('mfa::recovery-codes.copy') ?? 'heroicon-o-document-duplicate')
             ->extraAttributes([
@@ -44,7 +44,7 @@ trait CopiesRecoveryCodes
     public function downloadAction(): Action
     {
         return Action::make('download')
-            ->color('gray')
+            ->color('white')
             ->label(__('profile-filament::pages/security.mfa.recovery_codes.actions.download.label'))
             ->icon(FilamentIcon::resolve('mfa::recovery-codes.download') ?? 'heroicon-o-arrow-down-tray')
             ->action(function () {
@@ -58,11 +58,11 @@ trait CopiesRecoveryCodes
 
     public function printAction(): Action
     {
-        $url = Js::from(route('filament.' . filament()->getCurrentPanel()->getId() . '.auth.mfa.recovery-codes.print'));
+        $url = Js::from(route('filament.'.filament()->getCurrentPanel()->getId().'.auth.mfa.recovery-codes.print'));
 
         return Action::make('print')
             ->livewireClickHandlerEnabled(false)
-            ->color('gray')
+            ->color('white')
             ->label(__('profile-filament::pages/security.mfa.recovery_codes.actions.print.label'))
             ->icon(FilamentIcon::resolve('mfa::recovery-codes.print') ?? 'heroicon-o-printer')
             ->extraAttributes([

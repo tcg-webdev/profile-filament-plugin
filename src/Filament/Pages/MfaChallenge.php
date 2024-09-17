@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Timebox;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Rawilk\ProfileFilament\Contracts\TextOtpService as TextOtpServiceContract;
 use Rawilk\ProfileFilament\Dto\Auth\TwoFactorLoginEventBag;
 use Rawilk\ProfileFilament\Enums\Livewire\MfaChallengeMode;
 use Rawilk\ProfileFilament\Enums\Session\MfaSession;
@@ -37,6 +38,7 @@ use Throwable;
  * @property-read string $alternativesHeading
  * @property-read string $formLabel
  * @property-read bool $isTotp
+ * @property-read bool $isText
  * @property-read bool $isWebauthn
  * @property-read null|\Rawilk\ProfileFilament\Enums\Livewire\MfaChallengeMode $mfaChallengeMode
  * @property-read string|null $modeIcon
@@ -72,6 +74,12 @@ class MfaChallenge extends SimplePage
     public function isTotp(): bool
     {
         return $this->mfaChallengeMode === MfaChallengeMode::App;
+    }
+
+    #[Computed]
+    public function isText(): bool
+    {
+        return $this->mfaChallengeMode === MfaChallengeMode::Text;
     }
 
     #[Computed]
@@ -148,6 +156,7 @@ class MfaChallenge extends SimplePage
 
         $this->challengeOptions = $this->getChallengeOptionsFor($user);
         $this->mode = ProfileFilament::preferredMfaMethodFor($user, $this->challengeOptions);
+        $this->initializeTextCode();
 
         $this->form->fill();
     }
@@ -236,9 +245,9 @@ class MfaChallenge extends SimplePage
     {
         return [
             TextInput::make('code')
-                ->placeholder($this->isTotp ? __('profile-filament::pages/mfa.totp.placeholder') : __('profile-filament::pages/mfa.recovery_code.placeholder'))
+                ->placeholder(($this->isTotp || $this->isText) ? __('profile-filament::pages/mfa.totp.placeholder') : __('profile-filament::pages/mfa.recovery_code.placeholder'))
                 ->label('')
-                ->autocomplete($this->isTotp ? 'one-time-code' : null)
+                ->autocomplete(($this->isTotp || $this->isText) ? 'one-time-code' : null)
                 ->helperText($this->isTotp ? __('profile-filament::pages/mfa.totp.hint') : __('profile-filament::pages/mfa.recovery_code.hint'))
                 ->required(fn () => ! $this->isWebauthn)
                 ->autofocus(),
@@ -321,6 +330,10 @@ class MfaChallenge extends SimplePage
             $options[] = MfaChallengeMode::App->value;
         }
 
+        if (Mfa::canUseTextOTPForChallenge($user)) {
+            $options[] = MfaChallengeMode::Text->value;
+        }
+
         if (Mfa::canUseWebauthnForChallenge($user)) {
             $options[] = MfaChallengeMode::Webauthn->value;
         }
@@ -357,6 +370,15 @@ class MfaChallenge extends SimplePage
 
                 return true;
 
+            case MfaChallengeMode::Text->value:
+                if (! Mfa::isValidOtpCode($data['code'])) {
+                    $this->addError('code', __('profile-filament::pages/mfa.text.invalid'));
+
+                    return false;
+                }
+
+                return true;
+
             case MfaChallengeMode::Webauthn->value:
                 try {
                     Webauthn::verifyAssertion(
@@ -385,7 +407,14 @@ class MfaChallenge extends SimplePage
                 return true;
 
             default:
-                throw new Exception('Mfa method "' . $this->mode . '" is not supported by this package.');
+                throw new Exception('Mfa method "'.$this->mode.'" is not supported by this package.');
+        }
+    }
+
+    private function initializeTextCode(): void
+    {
+        if (MfaChallengeMode::Text->value === $this->mode) {
+            app(TextOtpServiceContract::class)->notifyChallengedUser(Mfa::challengedUser());
         }
     }
 }

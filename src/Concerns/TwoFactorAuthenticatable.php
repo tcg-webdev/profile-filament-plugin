@@ -23,6 +23,11 @@ trait TwoFactorAuthenticatable
         return "user:{$user->getAuthIdentifier()}:has-passkeys";
     }
 
+    public static function hasTextValidationKey(User $user): string
+    {
+        return "user:{$user->getAuthIdentifier()}:number-validation-code";
+    }
+
     public function recoveryCodes(): array
     {
         return json_decode(
@@ -53,6 +58,12 @@ trait TwoFactorAuthenticatable
     public function authenticatorApps(): HasMany
     {
         return $this->hasMany(config('profile-filament.models.authenticator_app'))
+            ->latest();
+    }
+
+    public function textOtps(): HasMany
+    {
+        return $this->hasMany(config('profile-filament.models.text_otp_code'))
             ->latest();
     }
 

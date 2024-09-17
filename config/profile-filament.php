@@ -37,6 +37,11 @@ return [
         'confirm_authenticator_app' => \Rawilk\ProfileFilament\Actions\AuthenticatorApps\ConfirmTwoFactorAppAction::class,
         'delete_authenticator_app' => \Rawilk\ProfileFilament\Actions\AuthenticatorApps\DeleteTwoFactorAppAction::class,
 
+        //Text otps
+        'confirm_text_otp' => \Rawilk\ProfileFilament\Actions\TextOtps\ConfirmTwoFactorTextAction::class,
+        'delete_text_otp' => \Rawilk\ProfileFilament\Actions\TextOtps\DeleteTwoFactorTextAction::class,
+        'verify_text_otp' => \Rawilk\ProfileFilament\Actions\TextOtps\VerifyTextOtpAction::class,
+
         // Webauthn
         'delete_webauthn_key' => \Rawilk\ProfileFilament\Actions\Webauthn\DeleteWebauthnKeyAction::class,
         'register_webauthn_key' => \Rawilk\ProfileFilament\Actions\Webauthn\RegisterWebauthnKeyAction::class,
@@ -64,6 +69,7 @@ return [
         'authenticator_app' => 'authenticator_apps',
         'webauthn_key' => 'webauthn_keys',
         'pending_user_email' => 'pending_user_emails',
+        'text_otp_code' => 'text_otp_codes',
         'old_user_email' => 'old_user_emails',
     ],
 
@@ -109,6 +115,14 @@ return [
          * can be used to revert a change if it wasn't made by the user.
          */
         'old_user_email' => \Rawilk\ProfileFilament\Models\OldUserEmail::class,
+
+        /**
+         * Text Otp Code
+         *
+         * This model is responsible for storing a user's otp code, which can be used
+         * to verify user by text message.
+         */
+        'text_otp_code' => \Rawilk\ProfileFilament\Models\TextOtpCode::class,
     ],
 
     /*
@@ -136,6 +150,7 @@ return [
     */
     'policies' => [
         'authenticator_app' => \Rawilk\ProfileFilament\Policies\AuthenticatorAppPolicy::class,
+        'text_otp_code' => \Rawilk\ProfileFilament\Policies\TextOtpCodePolicy::class,
         'webauthn_key' => \Rawilk\ProfileFilament\Policies\WebauthnKeyPolicy::class,
     ],
 
@@ -182,6 +197,23 @@ return [
          * Set the "remember" cookie after login from verification.
          */
         'login_remember' => true,
+    ],
+
+    /*
+     |--------------------------------------------------------------------------
+     | Twilio integration
+     |--------------------------------------------------------------------------
+     |
+     | Here you may define Twilio integration parameters from Twilio account.
+     |
+     */
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID', ''),
+        // token value from Twilio account
+        'token' => env('TWILIO_TOKEN', ''),
+        // phone number you wish to use as phone number to send from
+        'sender-phone-number' => env('TWILIO_PHONE_NUMBER', ''),
     ],
 
     /*

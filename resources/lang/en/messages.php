@@ -10,6 +10,13 @@ return [
 
     'mfa_challenge' => [
         'invalid_challenged_user' => 'Your user account could not be verified.',
+        'text' => [
+            'code_message' => 'Your verification code: :code',
+        ],
+    ],
+
+    'text' => [
+        'code_sent' => 'Authentication code has been sent as text to phone number :number',
     ],
 
     'sudo_challenge' => [
@@ -26,6 +33,15 @@ return [
             'use_label' => 'Use your authenticator app',
             'heading' => 'Authentication code',
             'help_text' => 'Open your two-factor authenticator (TOTP) app or browser extension to view your authentication code.',
+            'placeholder' => '6-digit code',
+            'invalid' => 'The code you entered is invalid.',
+            'submit' => 'Verify',
+        ],
+
+        'text' => [
+            'use_label' => 'Use your phone',
+            'heading' => 'Authentication code',
+            'help_text' => 'Please check your phone for SMS message containing the authentication code.',
             'placeholder' => '6-digit code',
             'invalid' => 'The code you entered is invalid.',
             'submit' => 'Verify',

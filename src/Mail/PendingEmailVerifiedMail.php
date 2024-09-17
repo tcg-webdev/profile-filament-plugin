@@ -61,11 +61,11 @@ class PendingEmailVerifiedMail extends Mailable implements ShouldQueue
         $markup = __('profile-filament::mail.request_details.heading');
 
         if ($this->ip) {
-            $markup .= '<br>' . __('profile-filament::mail.request_details.ip', ['ip' => $this->ip]);
+            $markup .= '<br>'.__('profile-filament::mail.request_details.ip', ['ip' => $this->ip]);
         }
 
         if ($this->date) {
-            $markup .= '<br>' . __('profile-filament::mail.request_details.date', ['date' => $this->date->format('D, j M Y g:i A (T O)')]);
+            $markup .= '<br>'.__('profile-filament::mail.request_details.date', ['date' => $this->date->format('D, j M Y g:i A (T O)')]);
         }
 
         return $markup;
@@ -76,6 +76,6 @@ class PendingEmailVerifiedMail extends Mailable implements ShouldQueue
         [$handle, $host] = explode('@', $email);
         [$hostName, $tld] = explode('.', $host, 2);
 
-        return Str::mask($handle, '*', 2) . '@' . Str::mask($hostName, '*', 2) . '.' . $tld;
+        return Str::mask($handle, '*', 2).'@'.Str::mask($hostName, '*', 2).'.'.$tld;
     }
 }
