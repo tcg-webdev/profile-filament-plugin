@@ -221,11 +221,14 @@ class TextOtpForm extends ProfileComponent
         return TextInput::make('number')
             ->label(__('profile-filament::pages/security.mfa.text.phone_number'))
             ->placeholder(__('profile-filament::pages/security.mfa.text.default_number'))
-            ->rules(['phone'])
+            ->rules(['phone:INTERNATIONAL,GB'])
             ->required()
             ->maxlength(255)
             ->autocomplete('off')
             ->maxWidth('xs')
+            ->validationMessages([
+                'phone' => __('profile-filament::validation.phone'),
+            ])
             ->unique(
                 table: config('profile-filament.table_names.text_otp_code'),
                 modifyRuleUsing: function (Unique $rule) {
