@@ -224,7 +224,7 @@ class TextOtpForm extends ProfileComponent
         return TextInput::make('number')
             ->label(__('profile-filament::pages/security.mfa.text.phone_number'))
             ->placeholder(__('profile-filament::pages/security.mfa.text.default_number'))
-            ->rules(['phone'])
+            ->rules(['phone:INTERNATIONAL,GB'])
             ->required()
             ->live(onBlur: true)
             ->maxlength(255)
