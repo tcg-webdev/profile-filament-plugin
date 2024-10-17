@@ -17,6 +17,7 @@ return [
 
     'text' => [
         'code_sent' => 'Authentication code has been sent as text to phone number :number',
+        'code_not_sent' => 'Authentication code could not be sent as text to phone number :number',
     ],
 
     'sudo_challenge' => [

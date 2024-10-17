@@ -10,11 +10,14 @@ use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Halt;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 use Illuminate\Validation\Rules\Unique;
 use Livewire\Attributes\Computed;
@@ -221,10 +224,17 @@ class TextOtpForm extends ProfileComponent
         return TextInput::make('number')
             ->label(__('profile-filament::pages/security.mfa.text.phone_number'))
             ->placeholder(__('profile-filament::pages/security.mfa.text.default_number'))
-            ->rules(['phone:INTERNATIONAL,GB'])
+            ->rules(['phone'])
             ->required()
+            ->live(onBlur: true)
             ->maxlength(255)
             ->autocomplete('off')
+            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                if(Str::startsWith($state,'0')) {
+                    $state = Str::replaceFirst('0', '+44', $state);
+                    $set('number', $state);
+                }
+            })
             ->maxWidth('xs')
             ->validationMessages([
                 'phone' => __('profile-filament::validation.phone'),

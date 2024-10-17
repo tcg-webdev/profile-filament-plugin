@@ -63,33 +63,30 @@ class TextOtpService implements TextOtpServiceContract
     public function sendCode(string $phoneNumber): mixed
     {
         $code = $this->generateSecretKey();
-        try {
-            $this->client->messages->create(
-                // The number you'd like to send the message to
-                $phoneNumber,
-                [
-                    'from' => $this->senderPhoneNumber,
-                    'body' => __('profile-filament::messages.mfa_challenge.text.code_message', ['code' => $code]),
-                ]
-            );
+        $this->client->messages->create(
+            $phoneNumber,
+            [
+                'from' => $this->senderPhoneNumber,
+                'body' => __('profile-filament::messages.mfa_challenge.text.code_message', ['code' => $code]),
+            ]
+        );
 
-            return $code;
-        } catch (TwilioException $ex) {
-            Log::error($ex->getMessage());
-        }
-
-        return false;
+        return $code;
     }
 
     public function notifyChallengedUser(User $user): void
     {
         $phones = app(TextOtpCode::class)::query()
-            ->where('user_id', $user->getAuthIdentifier())
-            ->get(['id', 'code', 'number']);
+                                         ->where('user_id', $user->getAuthIdentifier())
+                                         ->get(['id', 'code', 'number']);
         foreach ($phones as $phone) {
-            if ($code = $this->sendCode($phone->number)) {
-                $phone->code = $code;
-                $phone->save();
+            try {
+                if ($code = $this->sendCode($phone->number)) {
+                    $phone->code = $code;
+                    $phone->save();
+                }
+            } catch (TwilioException $e) {
+                Log::error($e->getMessage());
             }
         }
     }
