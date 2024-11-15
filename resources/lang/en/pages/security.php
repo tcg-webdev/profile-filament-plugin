@@ -82,7 +82,7 @@ return [
         'text' => [
             'title' => 'SMS code',
             'phone_number' => 'Phone number',
-            'default_number' => '+00000000',
+            'default_number' => '',
             'description' => 'Enter 6-digit code from received SMS text when prompted during sign-in',
             'device_count' => ':count number|:count numbers',
             'form_intro' => 'You can use your mobile phone number as a second factor to verify your identity when prompted during sign-in.',
@@ -90,7 +90,7 @@ return [
             'code_confirmation_input' => 'Verify the code from received sms text',
             'code_confirmation_placeholder' => '6-digit code',
             'code_verification_fail' => 'SMS text code verification failed. Please try again.',
-            'code_verification_pass' => 'SMS text code verification was successful.',
+            'code_verification_pass' => 'SMS text code verification was successful. Click Save.',
             'submit_code_confirmation' => 'Save',
             'cancel_code_confirmation' => 'Cancel',
             'phone_number_help' => 'Please enter valid phone number you have access to in order to receive sms text with code',

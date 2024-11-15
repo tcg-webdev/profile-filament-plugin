@@ -101,7 +101,7 @@ class TextOtpForm extends ProfileComponent
     {
         $this->reset('code', 'codeValid');
 
-        $this->number = __('profile-filament::pages/security.mfa.text.default_number');
+        $this->number = '';
 
         $this->showForm = true;
     }
