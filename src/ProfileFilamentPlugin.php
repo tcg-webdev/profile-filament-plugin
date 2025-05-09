@@ -70,7 +70,7 @@ class ProfileFilamentPlugin implements Plugin
             ->preparePages();
 
         $panel
-            ->discoverClusters(in: __DIR__ . '/Filament/Clusters', for: 'Rawilk\\ProfileFilament\\Filament\\Clusters');
+            ->discoverClusters(in: __DIR__.'/Filament/Clusters', for: 'Rawilk\\ProfileFilament\\Filament\\Clusters');
 
         if ($this->showInUserMenu && $this->isEnabled($this->rootProfilePage)) {
             $panel->userMenuItems([

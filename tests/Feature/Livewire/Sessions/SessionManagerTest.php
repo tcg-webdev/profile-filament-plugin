@@ -15,7 +15,7 @@ beforeEach(function () {
         'session.driver' => 'database',
     ]);
 
-    $migration = require __DIR__ . '/../../../Fixtures/database/migrations/create_sessions_table.php';
+    $migration = require __DIR__.'/../../../Fixtures/database/migrations/create_sessions_table.php';
     (new $migration)->up();
 
     $this->user = User::factory()->create(['password' => 'secret']);

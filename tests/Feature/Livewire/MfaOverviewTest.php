@@ -22,7 +22,7 @@ beforeEach(function () {
 
     login($this->user = User::factory()->create());
 
-    Route::get('/_test', fn () => Blade::render('@livewire(\'' . MfaOverview::class . '\')'));
+    Route::get('/_test', fn () => Blade::render('@livewire(\''.MfaOverview::class.'\')'));
 
     disableSudoMode();
 });

@@ -26,6 +26,7 @@ use Rawilk\ProfileFilament\Services\Sudo;
 use Rawilk\ProfileFilament\Services\Webauthn;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Twilio\Rest\Client;
 
 final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
 {
@@ -42,6 +43,7 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
                 'create_authenticator_apps_table',
                 'create_webauthn_keys_table',
                 'create_pending_user_emails_table',
+                'create_text_otps_table',
             ]);
     }
 
@@ -61,6 +63,15 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
             fn ($app) => new Services\AuthenticatorAppService(
                 engine: $app->make(Google2FA::class),
                 cache: $app->make(Cache::class),
+            ),
+        );
+
+        $this->app->scoped(
+            Contracts\TextOtpService::class,
+            fn ($app) => new Services\TextOtpService(
+                client: $app->makeWith(Client::class, ['username' => $app['config']['profile-filament.twilio.sid'],
+                    'password' => $app['config']['profile-filament.twilio.token']]),
+                senderPhoneNumber: $app['config']['profile-filament.twilio.sender-phone-number'],
             ),
         );
 
@@ -99,6 +110,11 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
         $this->app->bind(Contracts\AuthenticatorApps\ConfirmTwoFactorAppAction::class, fn ($app) => $app->make(config('profile-filament.actions.confirm_authenticator_app')));
         $this->app->bind(Contracts\AuthenticatorApps\DeleteAuthenticatorAppAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_authenticator_app')));
 
+        // text-otp
+        $this->app->bind(Contracts\TextOtps\ConfirmTwoFactorTextAction::class, fn ($app) => $app->make(config('profile-filament.actions.confirm_text_otp')));
+        $this->app->bind(Contracts\TextOtps\DeleteTextOtpCodeAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_text_otp')));
+        $this->app->bind(Contracts\TextOtps\VerifyTextOtpAction::class, fn ($app) => $app->make(config('profile-filament.actions.verify_text_otp')));
+
         // Webauthn
         $this->app->bind(Contracts\Webauthn\DeleteWebauthnKeyAction::class, fn ($app) => $app->make(config('profile-filament.actions.delete_webauthn_key')));
         $this->app->bind(Contracts\Webauthn\RegisterWebauthnKeyAction::class, fn ($app) => $app->make(config('profile-filament.actions.register_webauthn_key')));
@@ -120,13 +136,13 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
     private function registerAssets(): void
     {
         FilamentAsset::register([
-            AlpineComponent::make('webauthnForm', __DIR__ . '/../resources/dist/webauthn.js')
+            AlpineComponent::make('webauthnForm', __DIR__.'/../resources/dist/webauthn.js')
                 ->loadedOnRequest(),
         ], ProfileFilamentPlugin::PLUGIN_ID);
 
         FilamentAsset::register(
             assets: [
-                Css::make('profile-filament-plugin', __DIR__ . '/../resources/dist/plugin.css')->loadedOnRequest(),
+                Css::make('profile-filament-plugin', __DIR__.'/../resources/dist/plugin.css')->loadedOnRequest(),
             ],
             package: ProfileFilamentPlugin::PLUGIN_ID,
         );
@@ -176,6 +192,8 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
         Livewire::component('recovery-codes', PackageLivewire\TwoFactorAuthentication\RecoveryCodes::class);
         Livewire::component('authenticator-app-form', PackageLivewire\TwoFactorAuthentication\AuthenticatorAppForm::class);
         Livewire::component('authenticator-app-list-item', PackageLivewire\TwoFactorAuthentication\AuthenticatorAppListItem::class);
+        Livewire::component('text-otp-form', PackageLivewire\TwoFactorAuthentication\TextOtpForm::class);
+        Livewire::component('text-otp-list-item', PackageLivewire\TwoFactorAuthentication\TextOtpListItem::class);
         Livewire::component('webauthn-keys', PackageLivewire\TwoFactorAuthentication\WebauthnKeys::class);
         Livewire::component('webauthn-key', PackageLivewire\TwoFactorAuthentication\WebauthnKey::class);
         Livewire::component('passkey', PackageLivewire\Passkey::class);

@@ -2,7 +2,7 @@
     <x-profile-filament::component-section>
         <x-slot:title>
             <span class="flex items-center gap-x-2">
-                <span>{{ __('profile-filament::pages/security.mfa.title') }}</span>
+                <span id="mfa-tab">{{ __('profile-filament::pages/security.mfa.title') }}</span>
 
                 <x-filament::badge
                     :color="$this->hasMfaEnabled ? 'success' : 'danger'"

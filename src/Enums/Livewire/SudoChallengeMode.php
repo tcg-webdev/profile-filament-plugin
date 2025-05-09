@@ -11,12 +11,14 @@ enum SudoChallengeMode: string
 {
     case Password = 'password';
     case App = 'app';
+    case Text = 'text';
     case Webauthn = 'webauthn';
 
     public function heading(?User $user = null): ?string
     {
         return match ($this) {
             self::App => __('profile-filament::messages.sudo_challenge.totp.heading'),
+            self::Text => __('profile-filament::messages.sudo_challenge.text.heading'),
             self::Webauthn => $user?->hasPasskeys()
                 ? __('profile-filament::messages.sudo_challenge.webauthn.heading_including_passkeys')
                 : __('profile-filament::messages.sudo_challenge.webauthn.heading'),
@@ -28,6 +30,7 @@ enum SudoChallengeMode: string
     {
         return match ($this) {
             self::App => FilamentIcon::resolve('mfa::totp') ?? 'heroicon-o-device-phone-mobile',
+            self::Text => FilamentIcon::resolve('mfa::totp') ?? 'heroicon-o-chat-bubble-left-ellipsis',
             self::Webauthn => FilamentIcon::resolve('mfa::webauthn') ?? 'heroicon-o-shield-exclamation',
             default => null,
         };
@@ -38,6 +41,7 @@ enum SudoChallengeMode: string
         return match ($this) {
             self::Password => __('profile-filament::messages.sudo_challenge.password.use_label'),
             self::App => __('profile-filament::messages.sudo_challenge.totp.use_label'),
+            self::Text => __('profile-filament::messages.sudo_challenge.text.use_label'),
             self::Webauthn => $user?->hasPasskeys()
                 ? __('profile-filament::messages.sudo_challenge.webauthn.use_label_including_passkeys')
                 : __('profile-filament::messages.sudo_challenge.webauthn.use_label'),
@@ -49,6 +53,7 @@ enum SudoChallengeMode: string
         return match ($this) {
             self::Password => __('profile-filament::messages.sudo_challenge.password.submit'),
             self::App => __('profile-filament::messages.sudo_challenge.totp.submit'),
+            self::Text => __('profile-filament::messages.sudo_challenge.text.submit'),
             self::Webauthn => $user?->hasPasskeys()
                 ? __('profile-filament::messages.sudo_challenge.webauthn.submit_including_passkeys')
                 : __('profile-filament::messages.sudo_challenge.webauthn.submit'),

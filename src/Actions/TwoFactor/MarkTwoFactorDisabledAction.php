@@ -39,6 +39,10 @@ class MarkTwoFactorDisabledAction implements MarkTwoFactorDisabledActionContract
             return true;
         }
 
+        if ($this->hasTextOtps($user)) {
+            return true;
+        }
+
         if ($this->hasWebauthnKeys($user)) {
             return true;
         }
@@ -53,6 +57,15 @@ class MarkTwoFactorDisabledAction implements MarkTwoFactorDisabledActionContract
         }
 
         return $user->authenticatorApps()->exists();
+    }
+
+    protected function hasTextOtps(User $user): bool
+    {
+        if (! $this->features->hasTextOTP()) {
+            return false;
+        }
+
+        return $user->textOtps()->exists();
     }
 
     protected function hasWebauthnKeys(User $user): bool

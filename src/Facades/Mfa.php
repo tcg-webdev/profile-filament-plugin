@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static bool canUseAuthenticatorAppsForChallenge(User $user = null)
+ * @method static bool canUseTextOTPForChallenge(User $user = null)
  * @method static bool canUseWebauthnForChallenge(User $user = null)
  * @method static User challengedUser()
  * @method static void confirmUserSession(User $user)
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static bool hasChallengedUser()
  * @method static bool isValidRecoveryCode(string $code)
  * @method static bool isValidTotpCode(string $code)
+ * @method static bool isValidOtpCode(string $code)
  * @method static void pushChallengedUser(User $user, bool $remember = false)
  * @method static \Rawilk\ProfileFilament\Services\Mfa usingChallengedUser(?User $user)
  *

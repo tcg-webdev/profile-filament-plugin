@@ -9,11 +9,14 @@ use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Rawilk\ProfileFilament\Contracts\AuthenticatorAppService as AuthenticatorAppServiceContract;
+use Rawilk\ProfileFilament\Contracts\TextOtpService as TextOtpServiceContract;
 use Rawilk\ProfileFilament\Enums\Session\MfaSession;
 use Rawilk\ProfileFilament\Events\AuthenticatorApps\TwoFactorAppUsed;
 use Rawilk\ProfileFilament\Events\RecoveryCodeReplaced;
+use Rawilk\ProfileFilament\Events\TextOtps\TwoFactorTextUsed;
 use Rawilk\ProfileFilament\Events\TwoFactorAuthenticationChallenged;
 use Rawilk\ProfileFilament\Models\AuthenticatorApp;
+use Rawilk\ProfileFilament\Models\TextOtpCode;
 use Rawilk\ProfileFilament\ProfileFilamentPlugin;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -148,6 +151,35 @@ class Mfa
         return false;
     }
 
+    public function isValidOtpCode(string $code): bool
+    {
+        $phones = app(TextOtpCode::class)::query()
+            ->where('user_id', $this->challengedUser()->getAuthIdentifier())
+            ->get(['id', 'code', 'number']);
+
+        $shouldCreateNewOtpCode = true;
+
+        foreach ($phones as $phone) {
+            if (app(TextOtpServiceContract::class)->verify($phone->code, $code)) {
+                $phone->update(['last_used_at' => now()]);
+                TwoFactorTextUsed::dispatch($this->challengedUser(), $phone);
+
+                return true;
+            }
+        }
+
+        if ($shouldCreateNewOtpCode) {
+            foreach ($phones as $phone) {
+                if ($code = app(TextOtpServiceContract::class)->sendCode($phone->number)) {
+                    $phone->code = $code;
+                    $phone->save();
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function canUseAuthenticatorAppsForChallenge(?User $user = null): bool
     {
         if (
@@ -160,6 +192,22 @@ class Mfa
         $user ??= $this->challengedUser();
 
         return app(config('profile-filament.models.authenticator_app'))::query()
+            ->where('user_id', $user->getAuthIdentifier())
+            ->exists();
+    }
+
+    public function canUseTextOTPForChallenge(?User $user = null): bool
+    {
+        if (
+            Filament::getCurrentPanel()
+            && ! $this->profilePlugin()->panelFeatures()->hasTextOTP()
+        ) {
+            return false;
+        }
+
+        $user ??= $this->challengedUser();
+
+        return app(config('profile-filament.models.text_otp_code'))::query()
             ->where('user_id', $user->getAuthIdentifier())
             ->exists();
     }
@@ -194,7 +242,7 @@ class Mfa
 
     protected function getUserConfirmedKey(User $user): string
     {
-        return MfaSession::Confirmed->value . ".{$user->getAuthIdentifier()}";
+        return MfaSession::Confirmed->value.".{$user->getAuthIdentifier()}";
     }
 
     protected function profilePlugin(): ProfileFilamentPlugin

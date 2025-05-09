@@ -11,12 +11,14 @@ enum MfaChallengeMode: string
 {
     case App = 'app';
     case Webauthn = 'webauthn';
+    case Text = 'text';
     case RecoveryCode = 'code';
 
     public function icon(): string
     {
         return match ($this) {
             self::App => FilamentIcon::resolve('mfa::totp') ?? 'heroicon-o-device-phone-mobile',
+            self::Text => FilamentIcon::resolve('mfa::text') ?? 'heroicon-o-chat-bubble-left-ellipsis',
             self::Webauthn => FilamentIcon::resolve('mfa::webauthn') ?? 'heroicon-o-shield-exclamation',
             self::RecoveryCode => FilamentIcon::resolve('mfa::recovery-codes') ?? 'heroicon-o-key',
         };
@@ -26,6 +28,7 @@ enum MfaChallengeMode: string
     {
         return match ($this) {
             self::App => __('profile-filament::pages/mfa.totp.heading'),
+            self::Text => __('profile-filament::pages/mfa.text.heading'),
             self::Webauthn => __('profile-filament::pages/mfa.webauthn.heading'),
             self::RecoveryCode => __('profile-filament::pages/mfa.recovery_code.heading'),
         };
@@ -35,6 +38,7 @@ enum MfaChallengeMode: string
     {
         return match ($this) {
             self::App => __('profile-filament::pages/mfa.totp.label'),
+            self::Text => __('profile-filament::pages/mfa.text.label'),
             self::Webauthn => $user?->hasPasskeys()
                 ? __('profile-filament::pages/mfa.webauthn.label_including_passkeys')
                 : __('profile-filament::pages/mfa.webauthn.label'),
@@ -46,6 +50,7 @@ enum MfaChallengeMode: string
     {
         return match ($this) {
             self::App => __('profile-filament::pages/mfa.totp.alternative_heading'),
+            self::Text => __('profile-filament::pages/mfa.text.alternative_heading'),
             self::Webauthn => __('profile-filament::pages/mfa.webauthn.alternative_heading'),
             self::RecoveryCode => __('profile-filament::pages/mfa.recovery_code.alternative_heading'),
         };
@@ -55,6 +60,7 @@ enum MfaChallengeMode: string
     {
         return match ($this) {
             self::App => __('profile-filament::pages/mfa.totp.use_label'),
+            self::Text => __('profile-filament::pages/mfa.text.use_label'),
             self::Webauthn => $user?->hasPasskeys()
                 ? __('profile-filament::pages/mfa.webauthn.use_label_including_passkeys')
                 : __('profile-filament::pages/mfa.webauthn.use_label'),

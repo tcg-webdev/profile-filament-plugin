@@ -20,6 +20,16 @@ return [
         'invalid' => 'The code you entered is not valid.',
     ],
 
+    'text' => [
+        'heading' => 'Two-factor authentication',
+        'label' => 'Authentication code',
+        'placeholder' => '6-digit code',
+        'hint' => 'Open your phone to check for message containing your authentication code.',
+        'alternative_heading' => 'Unable to verify with your phone?',
+        'use_label' => 'Use your phone',
+        'invalid' => 'The code you entered is not valid.',
+    ],
+
     'recovery_code' => [
         'heading' => 'Two-factor recovery',
         'label' => 'Recovery code',

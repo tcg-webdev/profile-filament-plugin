@@ -118,6 +118,10 @@ class ProfileFilament
             return MfaChallengeMode::App->value;
         }
 
+        if (in_array(MfaChallengeMode::Text->value, $availableMethods, true)) {
+            return MfaChallengeMode::Text->value;
+        }
+
         if (in_array(MfaChallengeMode::Webauthn->value, $availableMethods, true)) {
             return MfaChallengeMode::Webauthn->value;
         }

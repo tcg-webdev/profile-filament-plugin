@@ -41,6 +41,7 @@ use function Filament\Support\get_color_css_variables;
 /**
  * @property-read \Illuminate\Support\Collection $alternateChallengeOptions
  * @property-read bool $isTotp
+ * @property-read bool $isText
  * @property-read bool $isWebauthn
  * @property-read null|string $formIcon
  * @property-read null|string $formLabel
@@ -84,6 +85,12 @@ class SudoChallenge extends SimplePage
     public function isTotp(): bool
     {
         return $this->sudoChallengeModeEnum === SudoChallengeMode::App;
+    }
+
+    #[Computed]
+    public function isText(): bool
+    {
+        return $this->sudoChallengeModeEnum === SudoChallengeMode::Text;
     }
 
     #[Computed]
@@ -217,7 +224,7 @@ class SudoChallenge extends SimplePage
         return [
             $this->isTotp
                 ? $this->getTotpInput()
-                : $this->getPasswordInput(),
+                : ($this->isText() ? $this->getTextInput() : $this->getPasswordInput()),
         ];
     }
 
@@ -244,6 +251,17 @@ class SudoChallenge extends SimplePage
             ->required()
             ->autofocus()
             ->statePath('data.totp');
+    }
+
+    protected function getTextInput(): Component
+    {
+        return TextInput::make('code')
+            ->hiddenLabel()
+            ->placeholder(__('profile-filament::messages.sudo_challenge.totp.placeholder'))
+            ->helperText(__('profile-filament::messages.sudo_challenge.text.help_text'))
+            ->required()
+            ->autofocus()
+            ->statePath('data.text');
     }
 
     protected function getFormActions(): array
@@ -326,6 +344,15 @@ class SudoChallenge extends SimplePage
 
                 return true;
 
+            case SudoChallengeMode::Text->value:
+                if (! Mfa::usingChallengedUser(filament()->auth()->user())->isValidOtpCode($data['code'] ?? '')) {
+                    $this->error = __('profile-filament::messages.sudo_challenge.text.invalid');
+
+                    return false;
+                }
+
+                return true;
+
             case SudoChallengeMode::Webauthn->value:
                 try {
                     Webauthn::verifyAssertion(
@@ -351,7 +378,7 @@ class SudoChallenge extends SimplePage
                 return true;
 
             default:
-                throw new Exception('Sudo challenge mode "' . $this->sudoChallengeMode . '" is not supported by this package.');
+                throw new Exception('Sudo challenge mode "'.$this->sudoChallengeMode.'" is not supported by this package.');
         }
     }
 }

@@ -20,6 +20,7 @@ final class Features
 
     private array $twoFactorOptions = [
         'authenticatorApps' => true,
+        'textOtp' => true,
         'webauthn' => true,
     ];
 
@@ -84,7 +85,7 @@ final class Features
 
         /** @phpstan-ignore-next-line */
         if (! is_callable($callback) && ! $callback instanceof self) {
-            throw new InvalidArgumentException('The given callback should be callable or an instance of ' . self::class);
+            throw new InvalidArgumentException('The given callback should be callable or an instance of '.self::class);
         }
 
         self::$defaultCallback = $callback;
@@ -152,6 +153,7 @@ final class Features
         ?bool $enabled = null,
         ?bool $authenticatorApps = null,
         ?bool $webauthn = null,
+        ?bool $textOtp = null,
         ?bool $passkeys = null,
     ): self {
         if (is_bool($enabled)) {
@@ -164,6 +166,10 @@ final class Features
 
         if (is_bool($webauthn)) {
             $this->twoFactorOptions['webauthn'] = $webauthn;
+        }
+
+        if (is_bool($textOtp)) {
+            $this->twoFactorOptions['textOtp'] = $textOtp;
         }
 
         if (is_bool($passkeys)) {
@@ -207,6 +213,11 @@ final class Features
     public function hasAuthenticatorApps(): bool
     {
         return $this->hasTwoFactorOption('authenticatorApps');
+    }
+
+    public function hasTextOTP(): bool
+    {
+        return $this->hasTwoFactorOption('textOtp');
     }
 
     public function hasTwoFactorOption(string $option): bool
