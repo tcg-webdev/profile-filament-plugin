@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Rawilk\ProfileFilament;
 
-use Filament\Http\Middleware\Authenticate as FilamentAuthenticate;
+use BladeUI\Icons\Factory;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +56,7 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->registerLivewireComponents();
+        $this->registerIcons();
 
         $this->app->scoped(
             Contracts\AuthenticatorAppService::class,
@@ -83,6 +85,16 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
                 expiration: $app['config']['profile-filament.sudo.expires'],
             ),
         );
+    }
+
+    private function registerIcons(): void
+    {
+        $this->callAfterResolving(Factory::class, function (Factory $factory) {
+            $factory->add('pf', [
+                'path' => __DIR__ . '/../resources/svg',
+                'prefix' => 'pf',
+            ]);
+        });
     }
 
     private function makeClassBindings(): void
@@ -119,25 +131,14 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
 
     private function registerAssets(): void
     {
-        FilamentAsset::register([
-            AlpineComponent::make('webauthnForm', __DIR__ . '/../resources/dist/webauthn.js')
-                ->loadedOnRequest(),
-        ], ProfileFilamentPlugin::PLUGIN_ID);
-
         FilamentAsset::register(
             assets: [
                 Css::make('profile-filament-plugin', __DIR__ . '/../resources/dist/plugin.css')->loadedOnRequest(),
+                AlpineComponent::make('registerWebauthn', __DIR__ . '/../resources/dist/webauthn/register.js')->loadedOnRequest(),
+                AlpineComponent::make('authenticateWebauthn', __DIR__ . '/../resources/dist/webauthn/authenticate.js')->loadedOnRequest(),
             ],
             package: ProfileFilamentPlugin::PLUGIN_ID,
         );
-
-        $sets = $this->app['config']->get('blade-icons.sets');
-        $sets['profile-filament'] = [
-            'path' => 'vendor/rawilk/profile-filament-plugin/resources/svg',
-            'prefix' => 'pf',
-        ];
-
-        $this->app['config']->set('blade-icons.sets', $sets);
     }
 
     private function registerRouteMacros(): void
@@ -147,7 +148,7 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
             macro: function (
                 string $prefix = 'sessions/webauthn',
                 array $assertionMiddleware = [ValidateSignature::class],
-                array $attestationMiddleware = [FilamentAuthenticate::class],
+                array $attestationMiddleware = [Authenticate::class],
             ) {
                 Route::as('profile-filament::')
                     ->group(function () use ($prefix, $assertionMiddleware, $attestationMiddleware) {
@@ -172,7 +173,6 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
 
     private function registerLivewireComponents(): void
     {
-        Livewire::component('masked-value', PackageLivewire\MaskedValue::class);
         Livewire::component('recovery-codes', PackageLivewire\TwoFactorAuthentication\RecoveryCodes::class);
         Livewire::component('authenticator-app-form', PackageLivewire\TwoFactorAuthentication\AuthenticatorAppForm::class);
         Livewire::component('authenticator-app-list-item', PackageLivewire\TwoFactorAuthentication\AuthenticatorAppListItem::class);
@@ -181,12 +181,15 @@ final class ProfileFilamentPluginServiceProvider extends PackageServiceProvider
         Livewire::component('passkey', PackageLivewire\Passkey::class);
         Livewire::component('mfa-challenge', MfaChallenge::class);
         Livewire::component('sudo-challenge', SudoChallenge::class);
+        Livewire::component('sudo-challenge-form', PackageLivewire\Sudo\SudoChallengeForm::class);
+        Livewire::component('sudo-challenge-action-form', PackageLivewire\Sudo\SudoChallengeActionForm::class);
 
         Livewire::component(PackageLivewire\Profile\ProfileInfo::class, PackageLivewire\Profile\ProfileInfo::class);
         Livewire::component(PackageLivewire\Emails\UserEmail::class, PackageLivewire\Emails\UserEmail::class);
         Livewire::component(PackageLivewire\DeleteAccount::class, PackageLivewire\DeleteAccount::class);
         Livewire::component(PackageLivewire\UpdatePassword::class, PackageLivewire\UpdatePassword::class);
         Livewire::component(PackageLivewire\PasskeyManager::class, PackageLivewire\PasskeyManager::class);
+        Livewire::component(PackageLivewire\PasskeyRegistrationForm::class, PackageLivewire\PasskeyRegistrationForm::class);
         Livewire::component(PackageLivewire\MfaOverview::class, PackageLivewire\MfaOverview::class);
         Livewire::component(PackageLivewire\Sessions\SessionManager::class, PackageLivewire\Sessions\SessionManager::class);
     }

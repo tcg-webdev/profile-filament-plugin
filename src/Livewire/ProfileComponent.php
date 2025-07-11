@@ -16,23 +16,25 @@ use Livewire\Component;
 use Rawilk\ProfileFilament\ProfileFilamentPlugin;
 
 /**
- * @property-read \Rawilk\ProfileFilament\ProfileFilamentPlugin $profilePlugin
+ * @property-read ProfileFilamentPlugin $profilePlugin
  */
 abstract class ProfileComponent extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
 
-    abstract protected function view(): string;
-
     #[Computed]
     public function profilePlugin(): FilamentManager|Plugin|ProfileFilamentPlugin
     {
-        return filament(ProfileFilamentPLugin::PLUGIN_ID);
+        return filament(ProfileFilamentPlugin::PLUGIN_ID);
     }
 
-    public function render(): View
+    public function render(): View|string
     {
-        return view($this->view());
+        if (method_exists($this, 'view')) {
+            return view($this->view());
+        }
+
+        return '';
     }
 }

@@ -11,10 +11,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\HtmlString;
-use Illuminate\Support\Str;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Rawilk\ProfileFilament\Exceptions\Webauthn\WrongUserHandle;
 use Rawilk\ProfileFilament\Facades\ProfileFilament;
+use Rawilk\ProfileFilament\Facades\Webauthn;
 use Webauthn\PublicKeyCredentialSource;
 
 use function Rawilk\ProfileFilament\wrapDateInTimeTag;
@@ -27,13 +27,12 @@ use function Rawilk\ProfileFilament\wrapDateInTimeTag;
  * @property array $public_key
  * @property null|string $attachment_type
  * @property bool $is_passkey
- * @property array $transports
  * @property null|\Illuminate\Support\Carbon $last_used_at
  * @property null|\Illuminate\Support\Carbon $created_at
  * @property null|\Illuminate\Support\Carbon $updated_at
- * @property-read \Webauthn\PublicKeyCredentialSource $public_key_credential_source
- * @property-read \Illuminate\Support\HtmlString $last_used
- * @property-read \Illuminate\Support\HtmlString $registered_at
+ * @property-read PublicKeyCredentialSource $public_key_credential_source
+ * @property-read HtmlString $last_used
+ * @property-read HtmlString $registered_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\Rawilk\ProfileFilament\Models\WebauthnKey byCredentialId(string $id)
  * @method static \Illuminate\Database\Eloquent\Builder|\Rawilk\ProfileFilament\Models\WebauthnKey notPasskeys()
@@ -42,13 +41,6 @@ use function Rawilk\ProfileFilament\wrapDateInTimeTag;
 class WebauthnKey extends Model
 {
     use HasFactory;
-
-    protected $casts = [
-        'public_key' => 'encrypted:json',
-        'transports' => 'array',
-        'is_passkey' => 'boolean',
-        'last_used_at' => 'immutable_datetime',
-    ];
 
     protected $hidden = [
         'public_key',
@@ -77,20 +69,19 @@ class WebauthnKey extends Model
 
         $data = [
             'name' => $keyName,
-            'user_id' => $user->getAuthIdentifier(),
             'attachment_type' => $attachmentType,
         ];
 
-        return tap(static::make($data), function (self $webauthnKey) use ($source) {
-            $webauthnKey->transports = $source->transports;
+        return tap(static::make($data), function (self $webauthnKey) use ($source, $user) {
             $webauthnKey->credential_id = $source->publicKeyCredentialId;
-            $webauthnKey->public_key = $source->jsonSerialize();
+            $webauthnKey->public_key = Webauthn::serializePublicKeyCredentialSource($source);
+
+            $webauthnKey->user()->associate($user);
         });
     }
 
     public static function getUsername(User $user): string
     {
-        /** @phpstan-ignore-next-line */
         return $user->email;
     }
 
@@ -135,7 +126,7 @@ class WebauthnKey extends Model
 
                 $translation = __('profile-filament::pages/security.mfa.method_last_used_date', ['date' => $date]);
 
-                return new HtmlString(Str::inlineMarkdown($translation));
+                return str($translation)->inlineMarkdown()->toHtmlString();
             },
         )->shouldCache();
     }
@@ -151,7 +142,7 @@ class WebauthnKey extends Model
     protected function publicKeyCredentialSource(): Attribute
     {
         return Attribute::make(
-            get: fn (): PublicKeyCredentialSource => PublicKeyCredentialSource::createFromArray($this->public_key),
+            get: fn (): PublicKeyCredentialSource => Webauthn::unserializeKeyData($this->public_key),
         )->shouldCache();
     }
 
@@ -163,8 +154,17 @@ class WebauthnKey extends Model
 
                 $translation = __('profile-filament::pages/security.mfa.method_registration_date', ['date' => wrapDateInTimeTag($date)]);
 
-                return new HtmlString(Str::inlineMarkdown($translation));
+                return str($translation)->inlineMarkdown()->toHtmlString();
             },
         )->shouldCache();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'public_key' => 'encrypted:json',
+            'is_passkey' => 'boolean',
+            'last_used_at' => 'immutable_datetime',
+        ];
     }
 }

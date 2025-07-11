@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Rawilk\ProfileFilament\Actions\Auth\PrepareUserSession;
 use Rawilk\ProfileFilament\Enums\Livewire\MfaChallengeMode;
 use Rawilk\ProfileFilament\Enums\Livewire\SudoChallengeMode;
+use Rawilk\ProfileFilament\Facades\Mfa;
 
 class ProfileFilament
 {
@@ -46,7 +47,7 @@ class ProfileFilament
     /**
      * Register a callback that is responsible for retrieving the authenticated user's timezone.
      */
-    public static function findUserTimezoneUsing(callable $callback): void
+    public static function findUserTimezoneUsing(?callable $callback): void
     {
         static::$findUserTimezoneUsingCallback = $callback;
     }
@@ -55,7 +56,7 @@ class ProfileFilament
      * Register a callback that is responsible for determining if our middleware
      * should enforce mfa.
      */
-    public static function shouldCheckForMfaUsing(callable $callback): void
+    public static function shouldCheckForMfaUsing(?callable $callback): void
     {
         static::$shouldCheckForMfaCallback = $callback;
     }
@@ -63,7 +64,7 @@ class ProfileFilament
     /**
      * Register a callback that is responsible for determining a user's preferred mfa method.
      */
-    public static function getPreferredMfaMethodUsing(callable $callback): void
+    public static function getPreferredMfaMethodUsing(?callable $callback): void
     {
         static::$getPreferredMfaMethodCallback = $callback;
     }
@@ -72,7 +73,7 @@ class ProfileFilament
      * Register a callback that is responsible for determining the pipes to send
      * a two-factor authentication challenge through.
      */
-    public static function mfaAuthenticationPipelineUsing(callable $callback): void
+    public static function mfaAuthenticationPipelineUsing(?callable $callback): void
     {
         static::$mfaAuthenticationPipelineCallback = $callback;
     }
@@ -85,7 +86,7 @@ class ProfileFilament
         $user ??= auth()->user();
 
         $userTimezone = is_null(static::$findUserTimezoneUsingCallback)
-            ? $user?->timezone /** @phpstan-ignore-line */
+            ? $user?->timezone
             : call_user_func(static::$findUserTimezoneUsingCallback, $user);
 
         return $userTimezone ?? 'UTC';
@@ -114,11 +115,11 @@ class ProfileFilament
         }
 
         // By default, return the first mfa method we find.
-        if (in_array(MfaChallengeMode::App->value, $availableMethods, true)) {
+        if (in_array(MfaChallengeMode::App, $availableMethods, true)) {
             return MfaChallengeMode::App->value;
         }
 
-        if (in_array(MfaChallengeMode::Webauthn->value, $availableMethods, true)) {
+        if (in_array(MfaChallengeMode::Webauthn, $availableMethods, true)) {
             return MfaChallengeMode::Webauthn->value;
         }
 
@@ -127,8 +128,7 @@ class ProfileFilament
 
     public function preferredSudoChallengeMethodFor(User $user, array $availableMethods): string
     {
-        /** @phpstan-ignore-next-line */
-        if (! $user->two_factor_enabled) {
+        if (! Mfa::userHasMfaEnabled($user)) {
             return SudoChallengeMode::Password->value;
         }
 

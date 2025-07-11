@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rawilk\ProfileFilament\Http\Controllers;
 
+use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Timebox;
@@ -13,19 +14,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebauthnPublicKeysController
 {
-    public function assertionPublicKey($user, Request $request): Response
+    public function assertionPublicKey(int|string $user, Request $request): Response
     {
         $publicKey = App::make(Timebox::class)->call(callback: function (Timebox $timebox) use ($user, $request) {
-            $user = app(config('auth.providers.users.model'))::findOrFail($user);
+            $user = $this->resolveUser($user);
 
-            $model = config('profile-filament.models.webauthn_key');
-            $publicKey = Webauthn::assertionObjectFor(
-                userId: app($model)::getUserHandle($user),
-            );
+            if (! $user) {
+                return null;
+            }
+
+            $publicKey = Webauthn::assertionObjectFor($user);
 
             session()->put(
                 $request->get('s') ?? MfaSession::AssertionPublicKey->value,
-                serialize($publicKey),
+                $publicKey,
             );
 
             $timebox->returnEarly();
@@ -33,21 +35,25 @@ class WebauthnPublicKeysController
             return $publicKey;
         }, microseconds: 300 * 1000);
 
-        return response()->json($publicKey->jsonSerialize());
+        if ($publicKey === null) {
+            return $this->genericAssertionOptions(
+                sessionKey: $request->get('s') ?? MfaSession::AssertionPublicKey->value,
+            );
+        }
+
+        return response()->json(
+            Webauthn::serializePublicKeyOptionsForRequest($publicKey)
+        );
     }
 
     public function attestationPublicKey(): Response
     {
         $publicKey = App::make(Timebox::class)->call(callback: function (Timebox $timebox) {
-            $model = config('profile-filament.models.webauthn_key');
-            $publicKey = Webauthn::attestationObjectFor(
-                username: app($model)::getUsername(auth()->user()),
-                userId: app($model)::getUserHandle(auth()->user()),
-            );
+            $publicKey = Webauthn::attestationObjectFor(auth()->user());
 
             session()->put(
                 MfaSession::AttestationPublicKey->value,
-                serialize($publicKey),
+                $publicKey,
             );
 
             $timebox->returnEarly();
@@ -55,6 +61,35 @@ class WebauthnPublicKeysController
             return $publicKey;
         }, microseconds: 300 * 1000);
 
-        return response()->json($publicKey->jsonSerialize());
+        return response()->json(
+            Webauthn::serializePublicKeyOptionsForRequest($publicKey)
+        );
+    }
+
+    protected function genericAssertionOptions(string $sessionKey): Response
+    {
+        $publicKey = Webauthn::genericAssertion();
+
+        session()->put(
+            $sessionKey,
+            $publicKey,
+        );
+
+        return response()->json(
+            Webauthn::serializePublicKeyOptionsForRequest($publicKey)
+        );
+    }
+
+    /**
+     * This method is inspired by how Filament resolves model
+     * records in resource pages.
+     */
+    protected function resolveUser(int|string $key): ?User
+    {
+        $model = app(config('auth.providers.users.model'));
+
+        return $model
+            ->resolveRouteBindingQuery($model::query(), $key)
+            ->first();
     }
 }

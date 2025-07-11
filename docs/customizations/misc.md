@@ -22,7 +22,7 @@ The callback you provide to `findUserTimezoneUsing` will receive a user model as
 
 ## User Menu
 
-The plugin automatically adds a root profile page entry to the user dropdown menu that Filament creates. By default, the root profile page is set to `\Rawilk\ProfileFilament\Filament\Clusters\Profile\ProfileInfo::class`, however you are free to change it to something else.
+The plugin automatically adds a root profile page entry to the user dropdown menu that Filament creates. By default, the root profile page is set to `\Rawilk\ProfileFilament\Filament\Pages\Profile\ProfileInfo::class`, however you are free to change it to something else.
 
 ![user menu](https://github.com/rawilk/profile-filament-plugin/blob/main/assets/images/user-menu.png?raw=true)
 
@@ -31,7 +31,7 @@ The plugin automatically adds a root profile page entry to the user dropdown men
 If you want to change the root profile page, you can use the `usingRootProfilePage` method on the plugin. The value you provide should be a class name to a page component.
 
 ```php
-use Rawilk\ProfileFilament\Filament\Clusters\Profile\Security;
+use Rawilk\ProfileFilament\Filament\Pages\Profile\Security;
 use Rawilk\ProfileFilament\ProfileFilamentPlugin;
 
 ProfileFilamentPlugin::make()
@@ -48,6 +48,14 @@ use Rawilk\ProfileFilament\ProfileFilamentPlugin;
 ProfileFilamentPlugin::make()
     ->usingClusterSlug('user');
 ```
+
+#### Multiple Panels Notice
+
+If you're using the plugin on multiple panels in your app and decide to use a different cluster slug for each panel, you may run into issues with custom pages. The way Filament resolves page urls and slugs is by using static functions. This normally isn't a problem, however in php static properties and methods are shared across all page instances, so this becomes an issue when each panel wants to have its own cluster slug.
+
+The way we've solved this in the plugin is by creating the `\Rawilk\ProfileFilament\Concerns\HasPanelPageRoutes` trait. This trait will override some page logic for defining and resolving routes. Simply add this trait to your custom page class, and we will resolve the correct cluster slug for you.
+
+Let's say you an admin panel, with a cluster slug of `/profile-settings`, and an app panel with a cluster slug of `/user-settings`. If you add our trait to a custom page class (with a slug of `/my-custom-profile-page`), it's url path will resolve to `/admin/profile-settings/my-custom-profile-page` and `/app/user-settings/my-custom-profile-page`, respectively.
 
 ### Menu Icon
 

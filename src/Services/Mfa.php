@@ -36,7 +36,7 @@ class Mfa
     protected ?bool $remember = null;
 
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $userModel
+     * @param  class-string<Model>  $userModel
      */
     public function __construct(protected string $userModel)
     {
@@ -82,19 +82,20 @@ class Mfa
             return $this->challengedUser;
         }
 
-        $user = $this->userModel::query()
-            ->withoutGlobalScopes()
-            ->whereKey(session()->get(MfaSession::User->value))
-            ->first();
+        return once(function () {
+            $user = $this->userModel::query()
+                ->withoutGlobalScopes()
+                ->whereKey(session()->get(MfaSession::User->value))
+                ->first();
 
-        abort_unless(
-            $user,
-            Response::HTTP_UNPROCESSABLE_ENTITY,
-            __('profile-filament::messages.mfa_challenge.invalid_challenged_user'),
-        );
+            abort_unless(
+                $user,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                __('profile-filament::messages.mfa_challenge.invalid_challenged_user'),
+            );
 
-        /** @phpstan-ignore-next-line */
-        return $this->challengedUser = $user;
+            return $user;
+        });
     }
 
     public function pushChallengedUser(User $user, bool $remember = false): void
@@ -113,7 +114,6 @@ class Mfa
             return false;
         }
 
-        /** @phpstan-ignore-next-line */
         $validCode = collect($this->challengedUser()->recoveryCodes())
             ->first(fn (string $storedCode) => hash_equals($code, $storedCode) ? $code : null);
 
@@ -121,7 +121,6 @@ class Mfa
             return false;
         }
 
-        /** @phpstan-ignore-next-line */
         $newCode = $this->challengedUser()->replaceRecoveryCode($validCode);
 
         RecoveryCodeReplaced::dispatch($this->challengedUser(), $validCode, $newCode);
@@ -159,6 +158,10 @@ class Mfa
 
         $user ??= $this->challengedUser();
 
+        if (! $this->userHasMfaEnabled($user)) {
+            return false;
+        }
+
         return app(config('profile-filament.models.authenticator_app'))::query()
             ->where('user_id', $user->getAuthIdentifier())
             ->exists();
@@ -174,6 +177,10 @@ class Mfa
         }
 
         $user ??= $this->challengedUser();
+
+        if (! $this->userHasMfaEnabled($user)) {
+            return false;
+        }
 
         return app(config('profile-filament.models.webauthn_key'))::query()
             ->where('user_id', $user->getAuthIdentifier())
@@ -192,6 +199,17 @@ class Mfa
         return $this->remember;
     }
 
+    public function userHasMfaEnabled(?User $user = null): bool
+    {
+        $user ??= auth()->user();
+
+        if (method_exists($user, 'hasTwoFactorEnabled')) {
+            return $user->hasTwoFactorEnabled();
+        }
+
+        return $user?->two_factor_enabled === true;
+    }
+
     protected function getUserConfirmedKey(User $user): string
     {
         return MfaSession::Confirmed->value . ".{$user->getAuthIdentifier()}";
@@ -199,8 +217,7 @@ class Mfa
 
     protected function profilePlugin(): ProfileFilamentPlugin
     {
-        /** @phpstan-ignore-next-line */
-        return Filament::getPlugin(ProfileFilamentPLugin::PLUGIN_ID);
+        return Filament::getPlugin(ProfileFilamentPlugin::PLUGIN_ID);
     }
 
     protected function hasWebauthnOrPasskeys(): bool

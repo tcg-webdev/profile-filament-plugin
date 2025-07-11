@@ -9,7 +9,7 @@ The Security profile page provides a UI for a user to update their password, as 
 
 Each of the components on this page can be customized and swapped out for your own implementations. See [Swap Components](/docs/profile-filament-plugin/{version}/customizations/page-customization#user-content-swap-components) for more information on how to do that.
 
-If you're looking to remove a certain component from the page, check out the [Available Features](/docs/profile-filament-plugion/{version}/customizations/features#user-content-available-features) documentation for more information on how to remove each of them.
+If you're looking to remove a certain component from the page, check out the [Available Features](/docs/profile-filament-plugin/{version}/customizations/features#user-content-available-features) documentation for more information on how to remove each of them.
 
 Most of the [translations](/docs/profile-filament-plugin/{version}/installation#user-content-translations) for this page are located in the `pages/security.php` and `pages/mfa.php` language files.
 
@@ -116,7 +116,7 @@ Authenticator apps are used to generate one-time passwords (totp) that are used 
 
 When an authenticator app is successfully registered, we will dispatch the `TwoFactorAppAdded` event from the `ConfirmTwoFactorAppAction`, which will receive the user and new authenticator app model instance. You may choose to listen for this event to alert a user when a new totp app is registered on their account.
 
-We will also mark mfa as enable on the user if it isn't already, and then also generate a set of [Recovery Codes](#user-content-recovery-codes) for the user.
+We will also mark mfa as enabled on the user if it isn't already, and then also generate a set of [Recovery Codes](#user-content-recovery-codes) for the user.
 
 #### Customize Confirm Action
 
