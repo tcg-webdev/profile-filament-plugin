@@ -20,10 +20,10 @@
         }
     ],
     "require": {
-        "php": "^8.2|^8.3",
+        "php": "^8.2|^8.3|^8.4",
         "bacon/bacon-qr-code": "^2.0",
         "filament/filament": "^3.2",
-        "illuminate/contracts": "^10.10|^11.0",
+        "illuminate/contracts": "^10.10|^11.0|^12.0",
         "mobiledetect/mobiledetectlib": "^4.8",
         "pragmarx/google2fa": "^8.0",
         "propaganistas/laravel-phone": "^5.2",
