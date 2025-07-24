@@ -27,7 +27,6 @@ class RecoveryCodes extends ProfileComponent
     public function generateAction(): Action
     {
         return Action::make('generate')
-            ->color('white')
             ->label(__('profile-filament::pages/security.mfa.recovery_codes.actions.generate.button'))
             ->requiresConfirmation()
             ->modalIcon(FilamentIcon::resolve('mfa::recovery-codes') ?? 'heroicon-o-key')

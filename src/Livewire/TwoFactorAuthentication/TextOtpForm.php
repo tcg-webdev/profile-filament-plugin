@@ -192,7 +192,6 @@ class TextOtpForm extends ProfileComponent
     {
         return Actions::make([
             FormAction::make('verify')
-                ->color('green')
                 ->action(fn () => $this->verifyPhoneNumber())
                 ->label(__('profile-filament::pages/security.mfa.text.verify_button')),
         ]);
